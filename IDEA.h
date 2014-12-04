@@ -12,5 +12,6 @@
 #include "Round.h"
 #include "Keycreate.h"
 void IDEAencrypt(typeint *message,typeint2 *key);
+void IDEAdecrypt(typeint *message, typeint2 *key);
 
 #endif /* defined(__IDEA__IDEA__) */

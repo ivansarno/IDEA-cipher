@@ -35,3 +35,26 @@ void keyrotate(uint16_t *key)
     key[7]=(key[7]<<9)+temp;
     
 }
+
+void deckey(typeint2 *key,typeint *subkey)
+{
+    typeint tempkey[56];
+    int i;
+    keycreate(key,tempkey);
+    subkey[0]=inverso(tempkey[48],mulmod);
+    subkey[1]=mod-(tempkey[49]);
+    subkey[2]=mod-(tempkey[50]);
+    subkey[3]=inverso(tempkey[51],mulmod);
+    
+    for(i=0;i<50;i+=6)
+    {
+        subkey[4+i]=tempkey[46-i];
+        subkey[5+i]=tempkey[47-i];
+        subkey[6+i]=inverso(tempkey[42-i],mulmod);
+        subkey[7+i]=mod-(tempkey[44-i]);
+        subkey[8+i]=mod-(tempkey[43-i]);
+        subkey[9+i]=inverso(tempkey[45-i],mulmod);
+    }
+        
+    
+}

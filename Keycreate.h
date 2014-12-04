@@ -10,10 +10,10 @@
 #define __IDEA__Keycreate__
 #include "define.h"
 
-
-
+//#include "ExtendedEuclide.c"
 void keyrotate(uint16_t *key);
 void keycreate(typeint2 *key, typeint *subkey);
+void deckey(typeint2 *key,typeint *subkey);
 
 
 #endif /* defined(__IDEA__Keycreate__) */

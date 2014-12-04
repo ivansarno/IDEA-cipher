@@ -17,3 +17,14 @@ void IDEAencrypt(typeint *message,typeint2 *key)
         Round(message, subkey+(6*i));
     Finalround(message, subkey+(6*i));
 }
+
+
+void IDEAdecrypt(typeint *message, typeint2 *key)
+{
+    typeint subkey[56];
+    deckey(key,subkey);
+    int i;
+    for(i=0;i<7;i++)
+        Round(message, subkey+(6*i));
+    Finalround(message, subkey+(6*i));
+}

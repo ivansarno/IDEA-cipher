@@ -10,7 +10,7 @@
 #define __IDEA__Round__
 
 #include "define.h"
-typeint mul(typeint a, typeint b);
+typeint mul(typeint3 a, typeint3 b);
 void step1(typeint *message,typeint *key);
 void step2(typeint *message, typeint *temp);
 void step3(typeint *temp, typeint *key);

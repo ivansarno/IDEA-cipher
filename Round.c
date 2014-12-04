@@ -39,7 +39,7 @@ void Finalround(typeint *message,typeint *key)
 }
 
 
-typeint mul(typeint a, typeint b)
+typeint mul(typeint3 a, typeint3 b)
 {
     if(a==0)
         a=mod;
