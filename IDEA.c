@@ -27,4 +27,5 @@ void IDEAdecrypt(typeint *message, typeint2 *key)
     for(i=0;i<7;i++)
         Round(message, subkey+(6*i));
     Finalround(message, subkey+(6*i));
+
 }

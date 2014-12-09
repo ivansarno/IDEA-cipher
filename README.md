@@ -4,6 +4,13 @@ IDEA-cipher
 IDEA cryptography algorithm by me
 
 
-beta version
-decryption not implemented
+testing version
+
+function parameters:
+
+- message array of 4 unsigned 16 bit int
+
+- key array of 8 unsigned 16 bit int
+
+main file is for testing
 

@@ -22,4 +22,6 @@ void Round(typeint *message,typeint *key);
 void Finalround(typeint *message,typeint *key);
 void step8(typeint *message,typeint *key);
 
+
+
 #endif /* defined(__IDEA__Round__) */

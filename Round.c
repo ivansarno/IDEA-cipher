@@ -39,6 +39,8 @@ void Finalround(typeint *message,typeint *key)
 }
 
 
+
+
 typeint mul(typeint3 a, typeint3 b)
 {
     if(a==0)
@@ -101,3 +103,4 @@ void step8(typeint *message,typeint *key)
     message[2]=(message[2]+key[8]) addmod;
     message[3]=mul(message[3],key[9]);
 }
+
