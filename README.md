@@ -4,13 +4,23 @@ IDEA-cipher
 IDEA cryptography algorithm by me
 
 
-testing version
+IDEA-cipher is a stand alone program thet takes as input:
 
-function parameters:
+number of char (multiple of 8);
 
-- message array of 4 unsigned 16 bit int
+e to encrypt or d to decrypt
 
-- key array of 8 unsigned 16 bit int
+text file
 
-main file is for testing
+key file (128 bit)
+
+and return output file in current directory
+
+
+IDEA.h is set of functions that implement IDEA algorithm for every need
+
+AAA
+
+REMEMBER to set your OS in define file
+
 
