@@ -37,6 +37,10 @@ long long inverso(long long n,long long Modulo)
 	triple ris = ExtendedEuclide(n,Modulo);
     if (ris.y<0)
     	ris.y=Modulo+ris.y;
+
+  #ifdef debug
     assert((ris.y*n)%Modulo==1);
+  #endif
+    
 	return  ris.y;
 }
