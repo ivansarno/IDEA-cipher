@@ -23,4 +23,8 @@ AAA
 
 REMEMBER to set your OS in define file
 
+AAA
+
+64 bit only :)
+
 

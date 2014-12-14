@@ -8,7 +8,7 @@
 
 //main for testing
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include "Round.h"
 #include "IDEA.h"
 #include "Keycreate.h"
@@ -31,3 +31,4 @@ int main(int argc, const char * argv[]) {
      
    
 }
+*/
