@@ -17,6 +17,6 @@
 #define xormod 
 #define mulmod 65537
 #define mod 65536
-#define //windows or unix
+#define unix //windows or unix
 
 #endif

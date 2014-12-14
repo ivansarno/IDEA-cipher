@@ -40,10 +40,10 @@ int main(int argc, char **argv)
 	}
 
 	uint16_t *text = (uint16_t *) malloc(num * sizeof(uint16_t));
-	uint16_t key[2];
+	uint16_t key[8];
 
 	fread(text, sizeof(uint16_t), num, textfile);
-	fread(key, sizeof(uint16_t), 2, keyfile);
+	fread(key, sizeof(uint16_t), 8, keyfile);
 
 	if (argv[2][0] == 'c' || argv[2][0] == 'e')
 		IDEA_multi_encrypt(text, key,num);
