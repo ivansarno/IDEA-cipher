@@ -9,9 +9,9 @@
 #include "Round.h"
 
 
-void Round(typeint *message,typeint *key)
+void Round(uint16_t *message,uint16_t *key)
 {
-    typeint temp[2];
+    uint16_t temp[2];
     
     step1(message,key);
     step2(message,temp);
@@ -24,9 +24,9 @@ void Round(typeint *message,typeint *key)
 }
 
 
-void Finalround(typeint *message,typeint *key)
+void Finalround(uint16_t *message,uint16_t *key)
 {
-    typeint temp[2];
+    uint16_t temp[2];
     
     step1(message,key);
     step2(message,temp);
@@ -41,17 +41,17 @@ void Finalround(typeint *message,typeint *key)
 
 
 
-typeint mul(typeint3 a, typeint3 b)
+uint16_t mul(unsigned long long a, unsigned long long b)
 {
     if(a==0)
         a=mod;
     if(b==0)
         b=mod;
-    return (typeint) ((a*b)%mulmod)addmod;
+    return (uint16_t) ((a*b)%mulmod)addmod;
 }
 
 
-void step1(typeint *message,typeint *key)
+void step1(uint16_t *message,uint16_t *key)
 {
     message[0]=mul(message[0],key[0]);
     message[1]=(message[1]+key[1]) addmod;
@@ -59,48 +59,49 @@ void step1(typeint *message,typeint *key)
     message[3]=mul(message[3],key[3]);
 }
 
-void step2(typeint *message, typeint *temp)
+void step2(uint16_t *message, uint16_t *temp)
 {
-    temp[0]= (message[0]^message[2])xormod;
-    temp[1]= (message[1]^message[3])xormod;
+    temp[0]= (message[0]^message[2]);
+    temp[1]= (message[1]^message[3]);
 }
 
-void step3(typeint *temp, typeint *key)
+void step3(uint16_t *temp, uint16_t *key)
 {
     temp[0]= mul(temp[0],key[4]);
     temp[1]= (temp[1]+temp[0])addmod;
 }
 
-void step4(typeint *temp, typeint *key)
+void step4(uint16_t *temp, uint16_t *key)
 {
     temp[1]= mul(temp[1],key[5]);
     temp[0]= (temp[1]+temp[0])addmod;
 }
 
-void step5(typeint *message,typeint *temp)
+void step5(uint16_t *message,uint16_t *temp)
 {
-    message[0]=(message[0]^temp[1])xormod;
-    message[2]=(message[2]^temp[1])xormod;
+    message[0]=(message[0]^temp[1]);
+    message[2]=(message[2]^temp[1]);
 }
 
-void step6(typeint *message,typeint *temp)
+void step6(uint16_t *message,uint16_t *temp)
 {
-    message[1]=(message[1]^temp[0])xormod;
-    message[3]=(message[3]^temp[0])xormod;
+    message[1]=(message[1]^temp[0]);
+    message[3]=(message[3]^temp[0]);
 }
 
-void step7(typeint *message)
+void step7(uint16_t *message)
 {
-    typeint aus=message[1];
+    uint16_t aus=message[1];
     message[1]=message[2];
     message[2]=aus;
 }
 
-void step8(typeint *message,typeint *key)
+void step8(uint16_t *message,uint16_t *key)
 {
     message[0]=mul(message[0],key[6]);
     message[1]=(message[1]+key[7]) addmod;
     message[2]=(message[2]+key[8]) addmod;
     message[3]=mul(message[3],key[9]);
 }
+
 

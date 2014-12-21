@@ -10,11 +10,7 @@
 #define IDEA_define_h
 
 #include <stdint.h>
-#define typeint uint16_t
-#define typeint2 uint16_t
-#define typeint3 unsigned long long
 #define addmod %65536
-#define xormod 
 #define mulmod 65537
 #define mod 65536
 #define  //windows or unix

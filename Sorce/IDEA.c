@@ -8,9 +8,9 @@
 
 #include "IDEA.h"
 
-void IDEA_single_encrypt(typeint *message, typeint2 *key)
+void IDEA_single_encrypt(uint16_t *message, uint16_t *key)
 {
-    typeint subkey[56];
+    uint16_t subkey[56];
     keycreate(key,subkey);
     int i;
     for(i=0;i<7;i++)
@@ -19,9 +19,9 @@ void IDEA_single_encrypt(typeint *message, typeint2 *key)
 }
 
 
-void IDEA_single_decrypt(typeint *message, typeint2 *key)
+void IDEA_single_decrypt(uint16_t *message, uint16_t *key)
 {
-    typeint subkey[56];
+    uint16_t subkey[56];
     deckey(key,subkey);
     int i;
     for(i=0;i<7;i++)
@@ -30,7 +30,7 @@ void IDEA_single_decrypt(typeint *message, typeint2 *key)
 
 }
 
-void IDEA_crypt(typeint *message, typeint2 *subkey)
+void IDEA_crypt(uint16_t *message, uint16_t *subkey)
 {
 	
 	int i;
@@ -41,9 +41,9 @@ void IDEA_crypt(typeint *message, typeint2 *subkey)
 }
 
 
-void IDEA_multi_encrypt(typeint *message, typeint2 *key, int num)
+void IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num)
 {
-	typeint subkey[56];
+	uint16_t subkey[56];
 	keycreate(key, subkey);
 	int i;
 	for (i = 0; i < num; i += 4)
@@ -52,12 +52,12 @@ void IDEA_multi_encrypt(typeint *message, typeint2 *key, int num)
 
 
 
-void IDEA_multi_decrypt(typeint *message, typeint2 *key,int num)
+void IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int num)
 {
-	typeint subkey[56];
+	uint16_t subkey[56];
 	deckey(key, subkey);
 	int i;
-	for (i = 0; i < num; i += 4)
+	for (i = 0; i < num ; i += 4)
 		IDEA_crypt(message + i, subkey);
 
 }

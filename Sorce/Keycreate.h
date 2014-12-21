@@ -12,9 +12,9 @@
 #include "ExtendedEuclide.h"
 
 void keyrotate(uint16_t *key);
-void keycreate(typeint2 *key, typeint *subkey);
-void deckey(typeint2 *key,typeint *subkey);
-typeint inv(typeint3 a);
+void keycreate(uint16_t *key, uint16_t *subkey);
+void deckey(uint16_t *key,uint16_t *subkey);
+uint16_t inv(unsigned long long a);
 
 
 #endif /* defined(__IDEA__Keycreate__) */
