@@ -5,6 +5,9 @@
 //  Created by ivan sarno on 09/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+/*
+ implementation of Extended Euclide algorithm to find the inverse of a numbere in module
+ */
 
 #ifndef IDEA_ExtendedEuclide_h
 #define IDEA_ExtendedEuclide_h

@@ -5,6 +5,10 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+/*
+ Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, mul operation is ad hoc for the algorithm.
+ See official algorithm reference for more details
+ */
 
 #ifndef __IDEA__Round__
 #define __IDEA__Round__

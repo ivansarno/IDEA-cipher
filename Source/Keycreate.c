@@ -5,10 +5,12 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+/*
+implementation of key shedule of IDEA, subkey array is allocated in the calling function.
+See official algorithm reference for more details
+*/
 
 #include "Keycreate.h"
-
-
 
 void keycreate(uint16_t *key, uint16_t *subkey)
 {
@@ -21,6 +23,9 @@ void keycreate(uint16_t *key, uint16_t *subkey)
     }
 }
 
+/*  
+the rotation of 25 bits of the key is implemented by copying elements of the array for the first 16 bits, and shift the remaining bits and adding the remaining digits to next element
+*/
 void keyrotate(uint16_t *key)
 {
     int i;
@@ -36,13 +41,14 @@ void keyrotate(uint16_t *key)
     key[7]=(key[7]<<9)+temp;
     
 }
-
+//additive inverse operator
 uint16_t inv(unsigned long long a)
 {
     
     return (uint16_t) mod-a;
 }
 
+//decryption subkey generator
 void deckey(uint16_t *key,uint16_t *subkey)
 {
     uint16_t tempkey[56];
@@ -54,6 +60,7 @@ void deckey(uint16_t *key,uint16_t *subkey)
     subkey[2]=inv(tempkey[50]);
     subkey[3]=(uint16_t)inverso(tempkey[51],mulmod);
 
+    //preswapped for final operation
     uint16_t t=tempkey[1];
     tempkey[1]=tempkey[2];
     tempkey[2]=t;

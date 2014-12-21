@@ -17,6 +17,21 @@ key file (128 bit)
 and return output file in current directory
 
 
+
+IDEA-cipher è un programma autonomo che implementa IDEA, prende come input:
+
+il numero di caratteri del testo (multiplo di 8)
+
+c per cripare d per decriptare
+
+file con il testo
+
+file con chiave binaria di 128 bit
+
+e restituisce il file output nella cartella corrente
+
+
+
 IDEA.h is set of functions that implement IDEA algorithm for every need
 
 AAA

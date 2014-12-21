@@ -5,6 +5,7 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+//complete set of fun to implement IDEA, detail in IDEA.c file
 
 #ifndef __IDEA__IDEA__
 #define __IDEA__IDEA__
