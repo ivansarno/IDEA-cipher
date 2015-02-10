@@ -1,14 +1,14 @@
 IDEA-cipher
 ===========
 
-IDEA cryptography algorithm by me
+IDEA cryptography algorithm implementation
 
 
 IDEA-cipher is a stand alone program thet takes as input:
 
 number of char (multiple of 8);
 
-e to encrypt or d to decrypt
+"e" to encrypt or "d" to decrypt
 
 text file
 
@@ -22,7 +22,7 @@ IDEA-cipher è un programma autonomo che implementa IDEA, prende come input:
 
 il numero di caratteri del testo (multiplo di 8)
 
-c per cripare d per decriptare
+"c" per cripare o "d" per decriptare
 
 file con il testo
 
