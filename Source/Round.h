@@ -5,6 +5,7 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+//Version V.1.1
 /*
  Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, mul operation is ad hoc for the algorithm.
  See official algorithm reference for more details

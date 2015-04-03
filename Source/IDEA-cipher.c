@@ -1,3 +1,5 @@
+//Version V.1.1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "IDEA.h"
@@ -26,7 +28,7 @@ int main(int argc, char **argv)
 	}
 
 	int num = atoi(argv[1]);
-	if (num % 8)
+	if (num % 8 || num < 0)
 	{
 		printf("error: number of character must be multiple of 8\ncomplete message and key with random char\n");
 		return 0;
@@ -71,9 +73,12 @@ int main(int argc, char **argv)
 	FILE *out; 
 	fopen_s(&out,"output", "wb");
 #endif
-
-	fwrite(text, sizeof(uint16_t), num, out);
-
+	
+	if(out)
+		fwrite(text, sizeof(uint16_t), num, out);
+	else
+		printf("error\n");
+	
 	fclose(textfile);
 	fclose(keyfile);
 	fclose(out);

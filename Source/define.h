@@ -5,6 +5,8 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
+//Version V.1.1
+
 //difine constant of algorithm and OS selection
 
 #ifndef IDEA_define_h

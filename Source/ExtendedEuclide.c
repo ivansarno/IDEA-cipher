@@ -1,6 +1,7 @@
 /*
 implementation of Extended Euclide algorithm to find the inverse of a numbere in module
 */
+//Version V.1.1
 
 typedef struct
 {
