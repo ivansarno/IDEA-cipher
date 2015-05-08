@@ -5,9 +5,11 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
-//Version V.1.1
+//Version V.1.2
 
 #include "IDEA.h"
+
+//AAA this functions destroies the key used
 
 //single instance encrypt fun, return 0 in case of error
 int IDEA_single_encrypt(uint16_t *message, uint16_t *key)
@@ -52,8 +54,8 @@ void IDEA_crypt(uint16_t *message, uint16_t *subkey)
 
 }
 
-//multi inscance encrypt fun to process for block with same key, return number of iterations performed successfully
-void IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num)
+//multi inscance encrypt fun to process for block with same key, return number of elements processed successfully
+int IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num)
 {
 	if(!message || !key || num < 1)
 		return 0;
@@ -64,12 +66,12 @@ void IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num)
 	for (i = 0; i < num; i += 4)
 		IDEA_crypt(message + i, subkey);
 	
-	return i / 4 - 1;
+	return i;
 }
 
 
-//multi inscance decrypt fun to process for block with same key
-void IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int num)
+//multi inscance decrypt fun to process for block with same key, return number of elements processed successfully
+int IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int num)
 {
 	if(!message || !key || num < 1)
 		return 0;
@@ -80,5 +82,5 @@ void IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int num)
 	for (i = 0; i < num ; i += 4)
 		IDEA_crypt(message + i, subkey);
 	
-	return i / 4 - 1;
+	return i;
 }

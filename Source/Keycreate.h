@@ -5,7 +5,7 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
-//Version V.1.1
+//Version V.1.2
 
 #ifndef __IDEA__Keycreate__
 #define __IDEA__Keycreate__
@@ -15,7 +15,7 @@
 void keyrotate(uint16_t *key);
 void keycreate(uint16_t *key, uint16_t *subkey);
 void deckey(uint16_t *key,uint16_t *subkey);
-uint16_t inv(unsigned long long a);
+uint16_t inv(uint16_t a);
 
 
 #endif /* defined(__IDEA__Keycreate__) */

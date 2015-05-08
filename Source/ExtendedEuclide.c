@@ -1,7 +1,7 @@
 /*
 implementation of Extended Euclide algorithm to find the inverse of a numbere in module
 */
-//Version V.1.1
+//Version V.1.2
 
 typedef struct
 {
@@ -35,7 +35,7 @@ triple ExtendedEuclide(long long a, long long b)
     return result;
 }
 
-long long inverso(long long n,long long Modulo)
+long long inverse(long long n,long long Modulo)
 {
 	triple ris = ExtendedEuclide(n,Modulo);
     if (ris.y<0)

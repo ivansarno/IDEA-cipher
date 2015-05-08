@@ -1,4 +1,4 @@
-//Version V.1.1
+//Version V.1.2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,64 +24,99 @@ int main(int argc, char **argv)
 	if (argc <5)
 	{
 		printf("error input\n");
-		return 0;
+		return -1;
 	}
 
 	int num = atoi(argv[1]);
 	if (num % 8 || num < 0)
 	{
 		printf("error: number of character must be multiple of 8\ncomplete message and key with random char\n");
-		return 0;
+		return -1;
 	}
 
 	num /= 2; //1 block of 16 bit represents 2 char
 
-	FILE *textfile, *keyfile;
+    FILE *textfile = NULL;
+    FILE *keyfile = NULL;
 
-#ifdef unix
+#ifdef Unix
 	textfile = fopen(argv[3], "rb");
 	keyfile = fopen(argv[4], "rb");
 #endif
 
-#ifdef windows
+#ifdef Windows
 	fopen_s(&textfile,argv[3], "rb");
 	fopen_s(&keyfile,argv[4], "rb");
 #endif
 
 	if (!(textfile && keyfile))
 	{
-		printf("error input\n");
-		return 0;
+		printf("error: can't open files\n");
+		return -1;
 	}
 
 	uint16_t *text = (uint16_t *) malloc(num * sizeof(uint16_t));
+    if(!text)
+    {
+        fclose(textfile);
+        fclose(keyfile);
+        printf("error: malloc fail\n");
+        return -1;
+    }
 	uint16_t key[8];
+    long check;
 
-	fread(text, sizeof(uint16_t), num, textfile);
-	fread(key, sizeof(uint16_t), 8, keyfile);
-
-	if (argv[2][0] == 'c' || argv[2][0] == 'e')
-		IDEA_multi_encrypt(text, key,num);
-	else if (argv[2][0] == 'd')
-		IDEA_multi_decrypt(text, key,num);
-
-#ifdef unix
-	FILE *out = fopen("output", "wb");
+	check = fread(text, sizeof(uint16_t), num, textfile);
+    if(check == num)
+    {
+        check = fread(key, sizeof(uint16_t), 8, keyfile);
+        if(check == 8)
+        {
+            if (argv[2][0] == 'c' || argv[2][0] == 'e')
+                check = IDEA_multi_encrypt(text, key,num);
+            else if (argv[2][0] == 'd')
+                check = IDEA_multi_decrypt(text, key,num);
+                else
+                    printf("invalid command\n");
+                
+            
+            if(check == num)
+            {
+#ifdef Unix
+                FILE *out = fopen("output", "wb");
 #endif
-
-#ifdef windows
-	FILE *out; 
-	fopen_s(&out,"output", "wb");
+                
+#ifdef Windows
+                FILE *out;
+                fopen_s(&out,"output", "wb");
 #endif
-	
-	if(out)
-		fwrite(text, sizeof(uint16_t), num, out);
-	else
-		printf("error\n");
+                
+                if(out)
+                {
+                    if(fwrite(text, sizeof(uint16_t), num, out) !=num)
+                        printf("error\n");
+                    fclose(out);
+                }
+                else
+                    printf("error\n");
+            }
+            else
+                printf("error\n");
+            
+
+        }
+        else
+            printf("error\n");
+
+    }
+    else
+        printf("error\n");
+
 	
 	fclose(textfile);
 	fclose(keyfile);
-	fclose(out);
+    free(text);
+	
 
 
 	return 0;
