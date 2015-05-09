@@ -13,9 +13,8 @@
 #define IDEA_define_h
 
 #include <stdint.h>
-#define addmod //%65536
 #define mulmod 65537
 #define mod 65536
-#define Unix //Windows or Unix
+#define Windows //Windows or Unix
 
 #endif
