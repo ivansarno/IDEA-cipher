@@ -15,6 +15,6 @@
 #include <stdint.h>
 #define mulmod 65537
 #define mod 65536
-#define Windows //Windows or Unix
+#define  //Windows or Unix
 
 #endif
