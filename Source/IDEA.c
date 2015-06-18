@@ -16,14 +16,14 @@ int IDEA_single_encrypt(uint16_t *message, uint16_t *key)
 {
 	if(!message || !key)
 		return 0;
-	
+
     uint16_t subkey[56];
     keycreate(key,subkey);
     int i;
     for(i=0;i<7;i++)
         Round(message, subkey+(6*i));
     Finalround(message, subkey+(6*i));
-	
+
 	return 1;
 }
 
@@ -32,21 +32,21 @@ int IDEA_single_decrypt(uint16_t *message, uint16_t *key)
 {
 	if(!message || !key)
 		return 0;
-	
+
     uint16_t subkey[56];
     deckey(key,subkey);
     int i;
     for(i=0;i<7;i++)
         Round(message, subkey+(6*i));
     Finalround(message, subkey+(6*i));
-	
+
 	return 1;
 }
 
 //single instance encrypt or decript fun with extern generation of subkey, to reuse the same
 void IDEA_crypt(uint16_t *message, uint16_t *subkey)
 {
-	
+
 	int i;
 	for (i = 0; i<7; i++)
 		Round(message, subkey + (6 * i));
@@ -54,33 +54,33 @@ void IDEA_crypt(uint16_t *message, uint16_t *subkey)
 
 }
 
-//multi inscance encrypt fun to process for block with same key, return number of elements processed successfully
-int IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num)
+//multi instance encrypt fun to process more blocks with same key, return number of blocks processed successfully
+int IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int blocks)
 {
-	if(!message || !key || num < 1)
+	if(!message || !key || blocks < 1)
 		return 0;
-	
+
 	uint16_t subkey[56];
 	keycreate(key, subkey);
 	int i;
-	for (i = 0; i < num; i += 4)
+	for (i = 0; i < blocks; i += 4)
 		IDEA_crypt(message + i, subkey);
-	
+
 	return i;
 }
 
 
-//multi inscance decrypt fun to process for block with same key, return number of elements processed successfully
-int IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int num)
+//multi instance decrypt fun to process more blocks with same key, return number of blocks processed successfully
+int IDEA_multi_decrypt(uint16_t *message, uint16_t *key,const int blocks)
 {
-	if(!message || !key || num < 1)
+	if(!message || !key || blocks < 1)
 		return 0;
-	
+
 	uint16_t subkey[56];
 	deckey(key, subkey);
 	int i;
-	for (i = 0; i < num ; i += 4)
+	for (i = 0; i < blocks ; i += 4)
 		IDEA_crypt(message + i, subkey);
-	
+
 	return i;
 }

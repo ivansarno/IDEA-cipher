@@ -12,6 +12,6 @@
 
 #ifndef IDEA_ExtendedEuclide_h
 #define IDEA_ExtendedEuclide_h
-long long inverse(long long n,long long Modulo);
+long long inverse(long long number,long long modulo);
 
 #endif

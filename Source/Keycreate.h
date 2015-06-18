@@ -6,6 +6,10 @@
 //  Copyright (c) 2014 ivan sarno. All rights reserved.
 //
 //Version V.1.2
+/*
+implementation of key shedule of IDEA, subkey array is allocated in the caller function.
+See official algorithm reference for more details
+*/
 
 #ifndef __IDEA__Keycreate__
 #define __IDEA__Keycreate__

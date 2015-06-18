@@ -19,7 +19,8 @@
 int IDEA_single_encrypt(uint16_t *message,uint16_t *key);
 int IDEA_single_decrypt(uint16_t *message, uint16_t *key);
 void IDEA_crypt(uint16_t *message, uint16_t *subkey);
-int IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int num);
-int IDEA_multi_decrypt(uint16_t *message, uint16_t *key, const int num);
+int IDEA_multi_encrypt(uint16_t *message, uint16_t *key, const int blocks);
+int IDEA_multi_decrypt(uint16_t *message, uint16_t *key, const int blocks);
 
+//details in IDEA.c file
 #endif /* defined(__IDEA__IDEA__) */

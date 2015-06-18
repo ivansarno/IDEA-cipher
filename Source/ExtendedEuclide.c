@@ -35,11 +35,11 @@ triple ExtendedEuclide(long long a, long long b)
     return result;
 }
 
-long long inverse(long long n,long long Modulo)
+long long inverse(long long number,long long modulo)
 {
-	triple ris = ExtendedEuclide(n,Modulo);
-    if (ris.y<0)
-    	ris.y=Modulo+ris.y;
-    
+	triple ris = ExtendedEuclide(number, modulo);
+    if (ris.y < 0)
+    	ris.y = modulo + ris.y;
+
 	return  ris.y;
 }

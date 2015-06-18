@@ -7,7 +7,7 @@
 //
 //Version V.1.2
 /*
-implementation of key shedule of IDEA, subkey array is allocated in the calling function.
+implementation of key shedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
@@ -24,8 +24,9 @@ void keycreate(uint16_t *key, uint16_t *subkey)
     }
 }
 
-/*  
-the rotation of 25 bits of the key is implemented by copying elements of the array for the first 16 bits, and shift the remaining bits and adding the remaining digits to next element
+/*
+the rotation of 25 bits of the key is implemented by copying elements of the array for the first 16 bits,
+shift the last 9 bits and adding the remaining digits to next element
 */
 void keyrotate(uint16_t *key)
 {
@@ -34,18 +35,19 @@ void keyrotate(uint16_t *key)
     for(i=0;i<7;i++)
         key[i]=key[i+1];
     key[7]=temp;
-    
+
     temp=key[0]>>7;
     for(i=0;i<7;i++)
         key[i]=(key[i]<<9)+(key[i+1]>>7);
-    
+
     key[7]=(key[7]<<9)+temp;
-    
+
 }
+
 //additive inverse operator
 uint16_t inv(uint16_t a)
 {
-    
+
     return (uint16_t) mod-a;
 }
 
@@ -54,7 +56,7 @@ void deckey(uint16_t *key,uint16_t *subkey)
 {
     uint16_t tempkey[56];
     int i;
-  
+
     keycreate(key,tempkey);
     subkey[0]=(uint16_t)inverse(tempkey[48],mulmod);
     subkey[1]=inv(tempkey[49]);
@@ -65,8 +67,8 @@ void deckey(uint16_t *key,uint16_t *subkey)
     uint16_t t=tempkey[1];
     tempkey[1]=tempkey[2];
     tempkey[2]=t;
-    
-    
+
+
     for(i=0;i<48;i+=6)
     {
         subkey[4+i]=tempkey[46-i];

@@ -6,31 +6,32 @@
 #include "define.h"
 /*
  IDEA-cipher is a stand alone program thet takes as input:
- 
+
  number of char (multiple of 8);
- 
- e to encrypt or d to decrypt
- 
+
+ "e" to encrypt or "d" to decrypt
+
  text file
- 
+
  key file (128 bit)
- 
+
  and return output file in current directory
 */
 
 
 int main(int argc, char **argv)
 {
+  //get input
 	if (argc <5)
 	{
 		printf("error input\n");
 		return -1;
 	}
 
-	int num = atoi(argv[1]);
+	int num = atoi(argv[1]); //number of char to process
 	if (num % 8 || num < 0)
 	{
-		printf("error: number of character must be multiple of 8\ncomplete message and key with random char\n");
+		printf("error: number of character must be multiple of 8\ncomplete message and with random char\n");
 		return -1;
 	}
 
@@ -78,19 +79,19 @@ int main(int argc, char **argv)
                 check = IDEA_multi_decrypt(text, key,num);
                 else
                     printf("invalid command\n");
-                
-            
+
+
             if(check == num)
             {
 #ifdef Unix
                 FILE *out = fopen("output", "wb");
 #endif
-                
+
 #ifdef Windows
                 FILE *out;
                 fopen_s(&out,"output", "wb");
 #endif
-                
+
                 if(out)
                 {
                     if(fwrite(text, sizeof(uint16_t), num, out) !=num)
@@ -98,25 +99,25 @@ int main(int argc, char **argv)
                     fclose(out);
                 }
                 else
-                    printf("error\n");
+                    printf("error: can't create out file\n");
             }
             else
                 printf("error\n");
-            
+
 
         }
         else
-            printf("error\n");
+            printf("error: key size incorrect\n");
 
     }
     else
-        printf("error\n");
+        printf("error: text size incorrect\n");
 
-	
+
 	fclose(textfile);
 	fclose(keyfile);
     free(text);
-	
+
 
 
 	return 0;
