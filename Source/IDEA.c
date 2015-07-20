@@ -9,7 +9,7 @@
 
 #include "IDEA.h"
 
-//AAA this functions destroies the key used
+//AAA this functions destroies the key
 
 //single instance encrypt fun, return 0 in case of error
 int IDEA_single_encrypt(uint16_t *message, uint16_t *key)

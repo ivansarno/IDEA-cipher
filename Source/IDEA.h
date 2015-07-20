@@ -14,7 +14,7 @@
 #include "Round.h"
 #include "Keycreate.h"
 
-//AAA this functions destroies the key used
+//AAA this functions destroies the key
 
 int IDEA_single_encrypt(uint16_t *message,uint16_t *key);
 int IDEA_single_decrypt(uint16_t *message, uint16_t *key);

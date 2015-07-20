@@ -73,8 +73,9 @@ int main(int argc, char **argv)
         check = fread(key, sizeof(uint16_t), 8, keyfile);
         if(check == 8)
         {
+            //processing
             if (argv[2][0] == 'c' || argv[2][0] == 'e')
-                check = IDEA_multi_encrypt(text, key,num);
+                check = IDEA_multi_encrypt(text, key,num); 
             else if (argv[2][0] == 'd')
                 check = IDEA_multi_decrypt(text, key,num);
                 else
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
             if(check == num)
             {
 #ifdef Unix
-                FILE *out = fopen("output", "wb");
+                FILE *out = fopen("output", "wb"); //open file
 #endif
 
 #ifdef Windows
@@ -94,7 +95,7 @@ int main(int argc, char **argv)
 
                 if(out)
                 {
-                    if(fwrite(text, sizeof(uint16_t), num, out) !=num)
+                    if(fwrite(text, sizeof(uint16_t), num, out) !=num) //writes output
                         printf("error\n");
                     fclose(out);
                 }

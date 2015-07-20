@@ -7,7 +7,7 @@
 //
 //Version V.1.2
 /*
-implementation of key shedule of IDEA, subkey array is allocated in the caller function.
+implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
