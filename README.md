@@ -22,7 +22,7 @@ IDEA-cipher è un programma autonomo che implementa IDEA, prende come input:
 
 il numero di caratteri del testo (multiplo di 8)
 
-"c" per cripare o "d" per decriptare
+"c" per criptare o "d" per decriptare
 
 file con il testo
 
