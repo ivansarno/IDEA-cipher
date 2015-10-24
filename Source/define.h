@@ -7,7 +7,7 @@
 //
 //Version V.1.2
 
-//difine constant of algorithm and OS selection
+//define constant of algorithm and OS selection
 
 #ifndef IDEA_define_h
 #define IDEA_define_h
