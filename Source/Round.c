@@ -3,47 +3,33 @@
 //  IDEA
 //
 //  Created by ivan sarno on 02/12/14.
-//  Copyright (c) 2014 ivan sarno. All rights reserved.
-//
-//Version V.1.2
+//  Copyright (c) 2014 ivan sarno.
+/*
+ This file is part of IDEA-cipher library
+ IDEA-cipher  is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ IDEA-cipher  is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with IDEA-cipher ; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ USA
+ */
+//Version V.1.3
 /*
 Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, mul operation is ad hoc for the algorithm.
 See official algorithm reference for more details
 */
 
 #include "Round.h"
-
-
-void Round(uint16_t *message,uint16_t *key)
-{
-    uint16_t temp[2];
-    
-    step1(message,key);
-    step2(message,temp);
-    step3(temp,key);
-    step4(temp,key);
-    step5(message,temp);
-    step6(message,temp);
-    step7(message);
-    
-}
-
-
-void Finalround(uint16_t *message,uint16_t *key)
-{
-    uint16_t temp[2];
-    
-    step1(message,key);
-    step2(message,temp);
-    step3(temp,key);
-    step4(temp,key);
-    step5(message,temp);
-    step6(message,temp);
-    step8(message,key);
-    
-}
-
-
+#define mulmod 65537
+#define mod 65536
 
 
 uint16_t mul(unsigned long long a, unsigned long long b)
@@ -107,6 +93,36 @@ void step8(uint16_t *message,uint16_t *key)
     message[1]=(message[1]+key[7]) ;
     message[2]=(message[2]+key[8]) ;
     message[3]=mul(message[3],key[9]);
+}
+
+
+void Round(uint16_t *message,uint16_t *key)
+{
+    uint16_t temp[2];
+    
+    step1(message,key);
+    step2(message,temp);
+    step3(temp,key);
+    step4(temp,key);
+    step5(message,temp);
+    step6(message,temp);
+    step7(message);
+    
+}
+
+
+void Finalround(uint16_t *message,uint16_t *key)
+{
+    uint16_t temp[2];
+    
+    step1(message,key);
+    step2(message,temp);
+    step3(temp,key);
+    step4(temp,key);
+    step5(message,temp);
+    step6(message,temp);
+    step8(message,key);
+    
 }
 
 

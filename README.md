@@ -28,7 +28,7 @@ IDEA.h is set of functions that implement IDEA algorithm for every need
 
 **AAA**
 
-**REMEMBER to set your OS in define file**
+**REMEMBER to set your OS in IDEA-cipher.c file, default is Unix**
 
 **AAA**
 

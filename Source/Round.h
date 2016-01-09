@@ -3,30 +3,35 @@
 //  IDEA
 //
 //  Created by ivan sarno on 02/12/14.
-//  Copyright (c) 2014 ivan sarno. All rights reserved.
-//
-//Version V.1.2
+//  Copyright (c) 2014 ivan sarno.
 /*
- Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, mul operation is ad hoc for the algorithm.
- See official algorithm reference for more details
+ This file is part of IDEA-cipher library
+ IDEA-cipher  is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ IDEA-cipher  is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with IDEA-cipher ; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ USA
  */
+//Version V.1.3
+
+//Implementation of round of IDEA algorithm. See official algorithm reference for more details
+
 
 #ifndef __IDEA__Round__
 #define __IDEA__Round__
+#include <stdint.h>
 
-#include "define.h"
-uint16_t mul(unsigned long long a, unsigned long long b);
-void step1(uint16_t *message,uint16_t *key);
-void step2(uint16_t *message, uint16_t *temp);
-void step3(uint16_t *temp, uint16_t *key);
-void step4(uint16_t *temp, uint16_t *key);
-void step5(uint16_t *message,uint16_t *temp);
-void step6(uint16_t *message,uint16_t *temp);
-void step7(uint16_t *message);
+
 void Round(uint16_t *message,uint16_t *key);
 void Finalround(uint16_t *message,uint16_t *key);
-void step8(uint16_t *message,uint16_t *key);
-
-
 
 #endif /* defined(__IDEA__Round__) */
