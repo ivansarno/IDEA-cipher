@@ -77,7 +77,7 @@ uint16_t mul_inverse(uint16_t number, uint32_t modulus)
     buffer[0] = number;
     buffer[1] = modulus;
     
-    while(buffer[j] > 0) //find intermediate values of greatest common divisor
+    while(buffer[j] != 0) //find intermediate values of greatest common divisor
     {
         j++;
         buffer[j] = buffer[j-2] % buffer[j-1];
