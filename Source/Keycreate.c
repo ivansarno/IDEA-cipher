@@ -10,18 +10,18 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  IDEA-cipher  is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with IDEA-cipher ; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.3
+//Version V.1.4
 /*
 implementation of key shedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
@@ -68,34 +68,34 @@ uint16_t mul_inverse(uint16_t number, uint32_t modulus)
     {
         return 0;
     }
-    
-    
+
+
     int j = 1;
     int64_t result, temp, intermediate;
     int64_t buffer[35];
-    
+
     buffer[0] = number;
     buffer[1] = modulus;
-    
+
     while(buffer[j] != 0) //find intermediate values of greatest common divisor
     {
         j++;
         buffer[j] = buffer[j-2] % buffer[j-1];
     }
-    
+
     result = 1;
     intermediate = 1;
     temp = 0;
-    
+
     while(j > 1) //inverse calculation from intermediates values
     {
-        
+
         j--;
         result = temp;
         temp = intermediate - ((buffer[j-1] / buffer[j]) * temp);
         intermediate = result;
     }
-    
+
     if(result > 0)
         return (uint16_t) result;
     else return (uint16_t) (modulus + result);
@@ -141,6 +141,3 @@ void decrypt_keycreate(uint16_t *key,uint16_t *subkey)
         subkey[9+i]=mul_inverse(tempkey[45-i],mulmod);
     }
 }
-
-
-

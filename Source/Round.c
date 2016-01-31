@@ -10,18 +10,18 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  IDEA-cipher  is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with IDEA-cipher ; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.3
+//Version V.1.4
 /*
 Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, mul operation is ad hoc for the algorithm.
 See official algorithm reference for more details
@@ -32,7 +32,7 @@ See official algorithm reference for more details
 #define mod 65536
 
 
-uint16_t mul(unsigned long long a, unsigned long long b)
+uint16_t mul(uint32_t a, uint32_t b)
 {
     if(a==0)
         a=mod;
@@ -99,7 +99,7 @@ void step8(uint16_t *message,uint16_t *key)
 void Round(uint16_t *message,uint16_t *key)
 {
     uint16_t temp[2];
-    
+
     step1(message,key);
     step2(message,temp);
     step3(temp,key);
@@ -107,14 +107,14 @@ void Round(uint16_t *message,uint16_t *key)
     step5(message,temp);
     step6(message,temp);
     step7(message);
-    
+
 }
 
 
 void Finalround(uint16_t *message,uint16_t *key)
 {
     uint16_t temp[2];
-    
+
     step1(message,key);
     step2(message,temp);
     step3(temp,key);
@@ -122,7 +122,5 @@ void Finalround(uint16_t *message,uint16_t *key)
     step5(message,temp);
     step6(message,temp);
     step8(message,key);
-    
+
 }
-
-
