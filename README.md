@@ -3,35 +3,19 @@ IDEA-cipher
 
 IDEA cryptography algorithm implementation
 
+IDEA-cipher is a stand alone program with this command line syntax:
 
-IDEA-cipher is a stand alone program thet takes as input:
+	IDEA cmd number_of_bytes input_file key_file
+	
+	when cmd is: -e to encrypt or -d to decrypt
+	and key_file contains a random key of 128 bits
 
-	-number of char (multiple of 8);
-	-"e" to encrypt or "d" to decrypt
-	-text file
-	-key file (128 bit)
+the program creates the output file in current directory.
 
-and return output file in current directory
+IDEA.h contains a set of functions that implement IDEA algorithm for every need
 
+**Compiler Warning**
 
-IDEA-cipher è un programma autonomo che implementa IDEA, prende come input:
-
-	-il numero di caratteri del testo (multiplo di 8)
-	-"c" per criptare o "d" per decriptare
-	-file con il testo
-	-file con chiave binaria di 128 bit
-
-e restituisce il file output nella cartella corrente
-
-
-IDEA.h is set of functions that implement IDEA algorithm for every need
-
-**AAA**
-
-**REMEMBER to set your OS in IDEA-cipher.c file, default is Unix**
-
-**AAA**
-
-64 bit only :)
+If your compiler reports warning or error for deprecated I/O function, define SAFEIO macro to solve
 
 
