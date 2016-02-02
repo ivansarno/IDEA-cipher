@@ -24,20 +24,6 @@
 #include "IDEA.h"
 #include <string.h>
 
-/*
- IDEA-cipher is a stand alone program thet takes as input:
-
- number of char (multiple of 8);
-
- "e" to encrypt or "d" to decrypt
-
- text file
-
- key file (128 bit)
-
- and return output file in current directory
-*/
-
 
 int main(int argc, char **argv)
 {
