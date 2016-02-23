@@ -1,0 +1,116 @@
+//
+//  Keycreate.c
+//  IDEA
+//
+//  Created by ivan sarno on 02/12/14.
+//  Copyright (c) 2014 ivan sarno.
+/*
+ This file is part of IDEA-cipher library
+ IDEA-cipher  is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ IDEA-cipher  is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with IDEA-cipher ; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ USA
+ */
+//Version V.1.4
+/*
+implementation of key shedule of IDEA, subkey array is allocated in the caller function.
+See official algorithm reference for more details
+*/
+
+#include "Keycreate.h"
+
+//add inverse operator
+uint16_t AddInverse(uint16_t number)
+{
+    const uint32_t addModulus = 65536;
+    return (uint16_t) addModulus-number;
+}
+
+//mul inverse operator
+uint16_t MulInverse(uint16_t number)
+{
+    const uint32_t mulModulus = 65537;
+    int j = 1;
+    int64_t result, temp, intermediate;
+    int64_t buffer[35];
+
+    buffer[0] = number;
+    buffer[1] = mulModulus;
+
+    while(buffer[j] != 0) //find intermediate values of greatest common divisor
+    {
+        j++;
+        buffer[j] = buffer[j-2] % buffer[j-1];
+    }
+
+    result = 1;
+    intermediate = 1;
+    temp = 0;
+
+    while(j > 1) //inverse calculation from intermediates values
+    {
+
+        j--;
+        result = temp;
+        temp = intermediate - ((buffer[j-1] / buffer[j]) * temp);
+        intermediate = result;
+    }
+
+    if(result > 0)
+        return (uint16_t) result;
+    else return (uint16_t) (mulModulus + result);
+}
+
+void EncryptKeyCreate(uint64_t *keyp, uint16_t *subKey)
+{
+    uint64_t *key = (uint64_t *) keyp;
+    uint64_t *temp = (uint64_t *) subKey;
+    int i;
+    temp[0] = key[0];
+    temp[1] = key[1];
+    for(i = 3; i < 14; i+=2)
+    {
+        temp[i-1] = ((temp[i-3]<<25)) | ((temp[i-2]>>39));
+        temp[i] = ((temp[i-2]<<25)) | ((temp[i-3]>>39));
+    }
+    
+}
+
+//decryption subkey generator
+void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
+{
+    uint16_t tempkey[56];
+    int i;
+
+    EncryptKeyCreate(key,tempkey);
+    subKey[0]=MulInverse(tempkey[48]);
+    subKey[1]=AddInverse(tempkey[49]);
+    subKey[2]=AddInverse(tempkey[50]);
+    subKey[3]=MulInverse(tempkey[51]);
+
+    //preswapped for final operation
+    uint16_t t=tempkey[1];
+    tempkey[1]=tempkey[2];
+    tempkey[2]=t;
+
+
+    for(i=0;i<48;i+=6)
+    {
+        subKey[4+i]=tempkey[46-i];
+        subKey[5+i]=tempkey[47-i];
+        subKey[6+i]=MulInverse(tempkey[42-i]);
+        subKey[7+i]=AddInverse(tempkey[44-i]);
+        subKey[8+i]=AddInverse(tempkey[43-i]);
+        subKey[9+i]=MulInverse(tempkey[45-i]);
+    }
+}
