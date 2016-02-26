@@ -21,9 +21,9 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.4
+//Version V.2.0
 /*
-implementation of key shedule of IDEA, subkey array is allocated in the caller function.
+implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
@@ -42,7 +42,7 @@ uint16_t MulInverse(uint16_t number)
     const uint32_t mulModulus = 65537;
     int j = 1;
     int64_t result, temp, intermediate;
-    int64_t buffer[35];
+    int64_t buffer[35];//35 is an upper bound for intermediate result of a inversion of a 16 bits integer
 
     buffer[0] = number;
     buffer[1] = mulModulus;
@@ -71,19 +71,19 @@ uint16_t MulInverse(uint16_t number)
     else return (uint16_t) (mulModulus + result);
 }
 
-void EncryptKeyCreate(uint64_t *keyp, uint16_t *subKey)
+void EncryptKeyCreate(uint64_t *key, uint16_t *subKey)
 {
-    uint64_t *key = (uint64_t *) keyp;
+
     uint64_t *temp = (uint64_t *) subKey;
     int i;
     temp[0] = key[0];
     temp[1] = key[1];
-    for(i = 3; i < 14; i+=2)
+    for(i = 3; i < 14; i+=2)//25 bit left shift
     {
         temp[i-1] = ((temp[i-3]<<25)) | ((temp[i-2]>>39));
         temp[i] = ((temp[i-2]<<25)) | ((temp[i-3]>>39));
     }
-    
+
 }
 
 //decryption subkey generator
@@ -114,3 +114,4 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
         subKey[9+i]=MulInverse(tempkey[45-i]);
     }
 }
+

@@ -21,49 +21,324 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
 */
-//Version V.1.4
+//Version V.2.0
 
 #include "IDEA.h"
-#include <string.h>
+#include "Round.h"
+#include "Keycreate.h"
+
 
 void IdeaRoutine(uint16_t *message, uint16_t *subkey)
 {
-    
+
     for (int i = 0; i<7; i++)
     {
         Round(message, subkey);
         subkey += 6;
     }
     FinalRound(message, subkey);
-    
+
 }
 
-//single instance encrypt fun, return 0 in case of error
+//single encryption, return 0 in case of error
 int IdeaEncrypt(uint64_t *message, uint64_t *key)
 {
-	if(!message || !key)
-		return 0;
-    
+    if(!message || !key)
+        return 0;
+
     uint16_t subkey[56];
     EncryptKeyCreate(key, subkey);
     IdeaRoutine((uint16_t *) message, subkey);
-    
 
-	return 1;
+
+    return 1;
 }
 
-//single instance decrypt fun, return 0 in case of error
+//single decryption, return 0 in case of error
 int IdeaDecrypt(uint64_t *message, uint64_t *key)
 {
-	if(!message || !key)
-		return 0;
+    if(!message || !key)
+        return 0;
 
     uint16_t subkey[56];
     DecryptKeyCreate(key,subkey);
     IdeaRoutine((uint16_t *) message, subkey);
 
-	return 1;
+    return 1;
 }
+
+//return number of block processed
+uint64_t IdeaCBCEncrypt(uint64_t *message, uint64_t *key, const uint64_t nonce, const uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    EncryptKeyCreate(key, subkey);
+
+    message[0] ^= nonce;
+    IdeaRoutine((uint16_t *) message, subkey);
+
+    uint64_t i=1;
+
+    for(; i<messageLength; i++)
+    {
+        message[i] ^= message[i-1];
+        IdeaRoutine((uint16_t *) (message+i), subkey);
+    }
+
+    return i;
+}
+
+//return number of block processed
+uint64_t IdeaCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength)
+{
+    {
+        if(!message || !key)
+            return 0;
+
+        uint64_t temp;
+        uint16_t subkey[56];
+        DecryptKeyCreate(key, subkey);
+
+
+        uint64_t i=0;
+
+        for(; i<messageLength; i++)
+        {
+            temp = message[i];
+            IdeaRoutine((uint16_t *) (message+i), subkey);
+            message[i] ^= nonce;
+            nonce = temp;
+        }
+
+        return i;
+    }
+}
+
+
+//return number of block processed
+uint64_t IdeaPCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint64_t temp;
+    uint16_t subkey[56];
+    EncryptKeyCreate(key, subkey);
+
+
+    uint64_t i=0;
+
+    for(; i<messageLength; i++)
+    {
+        temp = message[i];
+        message[i] ^= message[i-1];
+        IdeaRoutine((uint16_t *) (message+i), subkey);
+        nonce = temp ^ message[i];
+    }
+
+    return i;
+}
+
+//return number of block processed
+uint64_t IdeaPCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength)
+{
+    {
+        if(!message || !key)
+            return 0;
+
+        uint64_t temp;
+        uint16_t subkey[56];
+        DecryptKeyCreate(key, subkey);
+
+
+        uint64_t i=0;
+
+        for(; i<messageLength; i++)
+        {
+            temp = message[i];
+            IdeaRoutine((uint16_t *) (message+i), subkey);
+            message[i] ^= message[i-1];
+            nonce = temp ^ message[i];
+        }
+
+        return i;
+    }
+}
+
+
+//return number of block processed
+uint64_t IdeaCFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    EncryptKeyCreate(key, subkey);
+
+
+    IdeaRoutine((uint16_t *) &nonce, subkey);
+    message[0] ^= nonce;
+
+    uint64_t i=1;
+
+    for(; i<messageLength; i++)
+    {
+        nonce = message[i-1];
+        IdeaRoutine((uint16_t *) &nonce, subkey);
+        message[i] ^= nonce;
+    }
+
+    return i;
+}
+
+//return number of block processed
+uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength)
+{
+    {
+        if(!message || !key)
+            return 0;
+
+        uint64_t temp;
+        uint16_t subkey[56];
+        DecryptKeyCreate(key, subkey);
+
+
+        uint64_t i=0;
+
+        for(; i<messageLength; i++)
+        {
+            IdeaRoutine((uint16_t *) &nonce, subkey);
+            temp = message[i];
+            message[i] = nonce;
+            nonce = temp;
+        }
+
+        return i;
+    }
+}
+
+
+//return number of block processed
+uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    EncryptKeyCreate(key, subkey);
+
+
+    IdeaRoutine((uint16_t *) &nonce, subkey);
+    message[0] ^= nonce;
+
+    uint64_t i=1;
+
+    for(; i<messageLength; i++)
+    {
+        IdeaRoutine((uint16_t *) &nonce, subkey);
+        message[i] ^= nonce;
+    }
+
+    return i;
+}
+
+//return number of block processed
+uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    DecryptKeyCreate(key, subkey);
+
+
+    IdeaRoutine((uint16_t *) &nonce, subkey);
+    message[0] ^= nonce;
+
+    uint64_t i=1;
+
+    for(; i<messageLength; i++)
+    {
+        IdeaRoutine((uint16_t *) &nonce, subkey);
+        message[i] ^= nonce;
+    }
+
+    return i;
+}
+
+
+
+//return number of block processed, destroy the nonce
+uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    EncryptKeyCreate(key, subkey);
+
+
+    uint64_t i=0;
+
+    for(; i<messageLength; i++)
+    {
+        IdeaRoutine((uint16_t *) nonce, subkey);
+        message[i] ^= nonce[i];
+        message++;
+        nonce++;
+    }
+
+    return i;
+}
+
+//return number of block processed, destroy the nonce
+uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, const uint64_t messageLength)
+{
+    if(!message || !key)
+        return 0;
+
+    uint16_t subkey[56];
+    DecryptKeyCreate(key, subkey);
+
+
+    uint64_t i=0;
+
+    for(; i<messageLength; i++)
+    {
+        IdeaRoutine((uint16_t *) nonce, subkey);
+        message[i] ^= nonce[i];
+        message++;
+        nonce++;
+    }
+
+    return i;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

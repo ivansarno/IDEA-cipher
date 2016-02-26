@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.4
+//Version V.2.0
 /*
 Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, multiplication operation is ad hoc for the algorithm.
 See official algorithm reference for more details
@@ -90,8 +90,8 @@ void step7(uint16_t *message)
 void step8(uint16_t *message,uint16_t *key)
 {
     message[0]=IdeaMultiplication(message[0],key[6]);
-    message[1]=(message[1]+key[7]) ;
-    message[2]=(message[2]+key[8]) ;
+    message[1]=(message[1]+key[7]);
+    message[2]=(message[2]+key[8]);
     message[3]=IdeaMultiplication(message[3],key[9]);
 }
 

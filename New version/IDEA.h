@@ -21,22 +21,48 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.3
-//complete set of fun to implement IDEA, detail in IDEA.c file
+//Version V.2.0
+//complete set of fun to implement IDEA
 
 #ifndef __IDEA__IDEA__
 #define __IDEA__IDEA__
-
-#include "Round.h"
-#include "Keycreate.h"
+#include <stdint.h>
 
 
-//single instance encrypt fun, return 0 in case of error
+//single encryption, return 0 in case of error
 int IdeaEncrypt(uint64_t *message,uint64_t *key);
 
-//single instance decrypt fun, return 0 in case of error
+//single decryption, return 0 in case of error
 int IdeaDecrypt(uint64_t *message, uint64_t *key);
 
+//return number of block processed
+uint64_t IdeaCBCEncrypt(uint64_t *message, uint64_t *key, const uint64_t nonce, const uint64_t messageLength);
 
-//details in IDEA.c file
+//return number of block processed
+uint64_t IdeaCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaPCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaPCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaCFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
+
+//return number of block processed
+uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, const uint64_t messageLength);
+
+//return number of block processed, destroy the nonce
+uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength);
+
+//return number of block processed, destroy the nonce
+uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, const uint64_t messageLength);
+
 #endif /* defined(__IDEA__IDEA__) */

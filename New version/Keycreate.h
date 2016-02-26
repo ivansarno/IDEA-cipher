@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.4
+//Version V.2.0
 /*
 implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
@@ -31,7 +31,7 @@ See official algorithm reference for more details
 #define __IDEA__Keycreate__
 #include <stdint.h>
 
-void EncryptKeyCreate(uint64_t *keyp, uint16_t *subKey);
+void EncryptKeyCreate(uint64_t *key, uint16_t *subKey);
 void DecryptKeyCreate(uint64_t *key,uint16_t *subKey);
 
 #endif /* defined(__IDEA__Keycreate__) */

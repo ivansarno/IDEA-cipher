@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.4
+//Version V.2.0
 
 //Implementation of round of IDEA algorithm. See official algorithm reference for more details
 
