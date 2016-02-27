@@ -21,61 +21,31 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.1.4
+//Version V.2.0
 /*
-implementation of key shedule of IDEA, subkey array is allocated in the caller function.
+implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
 #include "Keycreate.h"
-#define mulmod 65537
-#define mod 65536
-
-
-/*
-the rotation of 25 bits of the key is implemented by copying elements of the array for the first 16 bits,
-shift the last 9 bits and adding the remaining digits to next element
-*/
-
-
-void keyrotate(uint16_t *key)
-{
-    int i;
-    uint16_t temp=key[0];
-    for(i=0;i<7;i++)
-        key[i]=key[i+1];
-    key[7]=temp;
-
-    temp=key[0]>>7;
-    for(i=0;i<7;i++)
-        key[i]=(key[i]<<9)+(key[i+1]>>7);
-
-    key[7]=(key[7]<<9)+temp;
-
-}
 
 //add inverse operator
-uint16_t add_inverse(uint16_t a)
+uint16_t AddInverse(uint16_t number)
 {
-
-    return (uint16_t) mod-a;
+    const uint32_t addModulus = 65536;
+    return (uint16_t) addModulus-number;
 }
 
 //mul inverse operator
-uint16_t mul_inverse(uint16_t number, uint32_t modulus)
+uint16_t MulInverse(uint16_t number)
 {
-    if (modulus == 0)
-    {
-        return 0;
-    }
-
-
+    const uint32_t mulModulus = 65537;
     int j = 1;
     int64_t result, temp, intermediate;
-    int64_t buffer[35];
+    int64_t buffer[35];//35 is an upper bound for intermediate result of a inversion of a 16 bits integer
 
     buffer[0] = number;
-    buffer[1] = modulus;
+    buffer[1] = mulModulus;
 
     while(buffer[j] != 0) //find intermediate values of greatest common divisor
     {
@@ -98,46 +68,50 @@ uint16_t mul_inverse(uint16_t number, uint32_t modulus)
 
     if(result > 0)
         return (uint16_t) result;
-    else return (uint16_t) (modulus + result);
+    else return (uint16_t) (mulModulus + result);
 }
 
-
-void keycreate(uint16_t *key, uint16_t *subkey)
+void EncryptKeyCreate(uint64_t *key, uint16_t *subKey)
 {
-    int i,j;
-    for(i=0;i<=48;i+=8)
+
+    uint64_t *temp = (uint64_t *) subKey;
+    int i;
+    temp[0] = key[0];
+    temp[1] = key[1];
+    for(i = 3; i < 14; i+=2)//25 bit left shift
     {
-        for(j=0;j<8;j++)
-            subkey[i+j]=key[j];
-        keyrotate(key);
+        temp[i-1] = ((temp[i-3]<<25)) | ((temp[i-2]>>39));
+        temp[i] = ((temp[i-2]<<25)) | ((temp[i-3]>>39));
     }
+
 }
 
 //decryption subkey generator
-void decrypt_keycreate(uint16_t *key,uint16_t *subkey)
+void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
 {
-    uint16_t tempkey[56];
+    uint16_t tempKey[56];
     int i;
 
-    keycreate(key,tempkey);
-    subkey[0]=mul_inverse(tempkey[48],mulmod);
-    subkey[1]=add_inverse(tempkey[49]);
-    subkey[2]=add_inverse(tempkey[50]);
-    subkey[3]=mul_inverse(tempkey[51],mulmod);
+    EncryptKeyCreate(key,tempKey);
+    subKey[0]=MulInverse(tempKey[48]);
+    subKey[1]=AddInverse(tempKey[49]);
+    subKey[2]=AddInverse(tempKey[50]);
+    subKey[3]=MulInverse(tempKey[51]);
 
     //preswapped for final operation
-    uint16_t t=tempkey[1];
-    tempkey[1]=tempkey[2];
-    tempkey[2]=t;
+    uint16_t t=tempKey[1];
+    tempKey[1]=tempKey[2];
+    tempKey[2]=t;
 
 
     for(i=0;i<48;i+=6)
     {
-        subkey[4+i]=tempkey[46-i];
-        subkey[5+i]=tempkey[47-i];
-        subkey[6+i]=mul_inverse(tempkey[42-i],mulmod);
-        subkey[7+i]=add_inverse(tempkey[44-i]);
-        subkey[8+i]=add_inverse(tempkey[43-i]);
-        subkey[9+i]=mul_inverse(tempkey[45-i],mulmod);
+        subKey[4+i]=tempKey[46-i];
+        subKey[5+i]=tempKey[47-i];
+        subKey[6+i]=MulInverse(tempKey[42-i]);
+        subKey[7+i]=AddInverse(tempKey[44-i]);
+        subKey[8+i]=AddInverse(tempKey[43-i]);
+        subKey[9+i]=MulInverse(tempKey[45-i]);
     }
 }
+
