@@ -1,5 +1,5 @@
 //
-//  Keycreate.c
+//  KeyCreation.c
 //  IDEA
 //
 //  Created by ivan sarno on 02/12/14.
@@ -27,7 +27,7 @@ implementation of key schedule of IDEA, subkey array is allocated in the caller 
 See official algorithm reference for more details
 */
 
-#include "Keycreate.h"
+#include "KeyCreation.h"
 
 //add inverse operator
 uint16_t AddInverse(uint16_t number)
@@ -71,17 +71,15 @@ uint16_t MulInverse(uint16_t number)
     else return (uint16_t) (mulModulus + result);
 }
 
-void EncryptKeyCreate(uint64_t *key, uint16_t *subKey)
+void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
 {
-
-    uint64_t *temp = (uint64_t *) subKey;
     int i;
-    temp[0] = key[0];
-    temp[1] = key[1];
+    subKey[0] = key[0];
+    subKey[1] = key[1];
     for(i = 3; i < 14; i+=2)//25 bit left shift
     {
-        temp[i-1] = ((temp[i-3]<<25)) | ((temp[i-2]>>39));
-        temp[i] = ((temp[i-2]<<25)) | ((temp[i-3]>>39));
+        subKey[i-1] = ((subKey[i-3]<<25)) | ((subKey[i-2]>>39));
+        subKey[i] = ((subKey[i-2]<<25)) | ((subKey[i-3]>>39));
     }
 
 }
@@ -92,7 +90,7 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
     uint16_t tempKey[56];
     int i;
 
-    EncryptKeyCreate(key,tempKey);
+    EncryptKeyCreate(key,(uint64_t *)tempKey);
     subKey[0]=MulInverse(tempKey[48]);
     subKey[1]=AddInverse(tempKey[49]);
     subKey[2]=AddInverse(tempKey[50]);
@@ -113,5 +111,17 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
         subKey[8+i]=AddInverse(tempKey[43-i]);
         subKey[9+i]=MulInverse(tempKey[45-i]);
     }
+
+    SecureMemoryWipe((void *) tempKey, 112);
 }
 
+//aux fun to clean sensitive information;
+void SecureMemoryWipe(void *pointer, uint64_t size)
+{
+    volatile uint8_t *p = (volatile uint8_t *)pointer;
+    uint64_t i;
+    for(i=0; i<size; i++)
+    {
+        p[i] = 0;
+    }
+}

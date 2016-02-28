@@ -1,5 +1,5 @@
 //
-//  Round.h
+//  KeyCreation.h
 //  IDEA
 //
 //  Created by ivan sarno on 02/12/14.
@@ -22,15 +22,19 @@
  USA
  */
 //Version V.2.0
+/*
+implementation of key schedule of IDEA, subkey array is allocated in the caller function.
+See official algorithm reference for more details
+*/
 
-//Implementation of round of IDEA algorithm. See official algorithm reference for more details
-
-
-#ifndef __IDEA__Round__
-#define __IDEA__Round__
+#ifndef __IDEA__Keycreate__
+#define __IDEA__Keycreate__
 #include <stdint.h>
 
-void Round(uint16_t *message,uint16_t *key);
-void FinalRound(uint16_t *message,uint16_t *key);
+//aux fun to clean sensitive information;
+void SecureMemoryWipe(void *pointer, uint64_t size);
 
-#endif /* defined(__IDEA__Round__) */
+void EncryptKeyCreate(uint64_t *key, uint64_t *subKey);
+void DecryptKeyCreate(uint64_t *key,uint16_t *subKey);
+
+#endif /* defined(__IDEA__Keycreate__) */

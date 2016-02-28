@@ -25,12 +25,12 @@
 
 #include "IDEA.h"
 #include "Round.h"
-#include "Keycreate.h"
+#include "KeyCreation.h"
+
 
 
 void IdeaRoutine(uint16_t *message, uint16_t *subKey)
 {
-
     for (int i = 0; i<7; i++)
     {
         Round(message, subKey);
@@ -47,10 +47,10 @@ int IdeaEncrypt(uint64_t *message, uint64_t *key)
         return 0;
 
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *) subKey);
     IdeaRoutine((uint16_t *) message, subKey);
 
-
+    SecureMemoryWipe((void *)subKey, 112);
     return 1;
 }
 
@@ -63,7 +63,8 @@ int IdeaDecrypt(uint64_t *message, uint64_t *key)
     uint16_t subKey[56];
     DecryptKeyCreate(key,subKey);
     IdeaRoutine((uint16_t *) message, subKey);
-
+    
+    SecureMemoryWipe((void *)subKey, 112);
     return 1;
 }
 
@@ -74,7 +75,7 @@ uint64_t IdeaCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         return 0;
 
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *) subKey);
 
     message[0] ^= nonce;
     IdeaRoutine((uint16_t *) message, subKey);
@@ -86,7 +87,8 @@ uint64_t IdeaCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         message[i] ^= message[i-1];
         IdeaRoutine((uint16_t *) (message+i), subKey);
     }
-
+    
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -112,6 +114,7 @@ uint64_t IdeaCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
             nonce = temp;
         }
 
+        SecureMemoryWipe((void *)subKey, 112);
         return i;
     }
 }
@@ -125,7 +128,7 @@ uint64_t IdeaPCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint6
 
     uint64_t temp;
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *)subKey);
 
 
     uint64_t i;
@@ -138,6 +141,7 @@ uint64_t IdeaPCBCEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint6
         nonce = temp ^ message[i];
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -163,6 +167,7 @@ uint64_t IdeaPCBCDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint6
             nonce = temp ^ message[i];
         }
 
+        SecureMemoryWipe((void *)subKey, 112);
         return i;
     }
 }
@@ -175,7 +180,7 @@ uint64_t IdeaCFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         return 0;
 
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *)subKey);
 
 
     IdeaRoutine((uint16_t *) &nonce, subKey);
@@ -190,6 +195,7 @@ uint64_t IdeaCFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         message[i] ^= nonce;
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -215,6 +221,7 @@ uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
             nonce = temp;
         }
 
+        SecureMemoryWipe((void *)subKey, 112);
         return i;
     }
 }
@@ -227,7 +234,7 @@ uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         return 0;
 
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *)subKey);
 
 
     uint64_t i;
@@ -238,6 +245,7 @@ uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         message[i] ^= nonce;
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -258,6 +266,7 @@ uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         message[i] ^= nonce;
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -270,7 +279,7 @@ uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
         return 0;
 
     uint16_t subKey[56];
-    EncryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key, (uint64_t *)subKey);
 
 
     uint64_t i;
@@ -283,6 +292,7 @@ uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
         nonce++;
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
@@ -306,6 +316,7 @@ uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
         nonce++;
     }
 
+    SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
 
