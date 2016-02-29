@@ -208,7 +208,7 @@ uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
 
         uint64_t temp;
         uint16_t subKey[56];
-        DecryptKeyCreate(key, subKey);
+        EncryptKeyCreate(key, (uint64_t *)subKey);
 
 
         uint64_t i;
@@ -256,7 +256,7 @@ uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
         return 0;
 
     uint16_t subKey[56];
-    DecryptKeyCreate(key, subKey);
+    EncryptKeyCreate(key,(uint64_t *) subKey);
 
     uint64_t i;
 
@@ -280,14 +280,15 @@ uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
 
     uint16_t subKey[56];
     EncryptKeyCreate(key, (uint64_t *)subKey);
-
+    uint64_t tempNonce;
 
     uint64_t i;
 
     for(i=0; i<messageLength; i++)
     {
-        IdeaRoutine((uint16_t *) nonce, subKey);
-        message[i] ^= nonce[i];
+        tempNonce = *nonce;
+        IdeaRoutine((uint16_t *) &tempNonce, subKey);
+        *message ^= tempNonce;
         message++;
         nonce++;
     }
@@ -303,15 +304,16 @@ uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
         return 0;
 
     uint16_t subKey[56];
-    DecryptKeyCreate(key, subKey);
-
+    EncryptKeyCreate(key,(uint64_t *) subKey);
+    uint64_t tempNonce;
 
     uint64_t i;
 
     for(i=0; i<messageLength; i++)
     {
-        IdeaRoutine((uint16_t *) nonce, subKey);
-        message[i] ^= nonce[i];
+        tempNonce = *nonce;
+        IdeaRoutine((uint16_t *) &tempNonce, subKey);
+        *message ^= tempNonce;
         message++;
         nonce++;
     }

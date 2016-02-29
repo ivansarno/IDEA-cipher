@@ -44,28 +44,22 @@ int KeyStore(uint64_t *key)
 
 int Encryption(uint64_t *message, uint64_t *key, uint64_t size)
 {
-    printf("Encryption not avaiable");
-    return 0;
-    /*
     if(IdeaCBCEncrypt(message, key, key[2], size) == size)
     {
         printf("Error: encyption fail\n");
         return 3;
     }
-    return 0;*/
+    return 0;
 }
 
 int Decription(uint64_t *message, uint64_t *key, uint64_t size)
 {
-    printf("Decryption not avaiable");
-    return 0;
-    /*
      if(IdeaCBCDecrypt(message, key, key[2], size) == size)
      {
      printf("Error: encyption fail\n");
      return 3;
      }
-     return 0;*/
+     return 0;
 }
 
 int GenAndEncrypt(uint64_t *message, uint64_t size, FILE *output)

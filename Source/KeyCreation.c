@@ -70,18 +70,61 @@ uint16_t MulInverse(uint16_t number)
         return (uint16_t) result;
     else return (uint16_t) (mulModulus + result);
 }
+//eliminare
+void keyrotate(uint16_t *key)
+{
+    int i;
+    uint16_t temp=key[0];
+    for(i=0;i<7;i++)
+        key[i]=key[i+1];
+    key[7]=temp;
+    
+    temp=key[0]>>7;
+    for(i=0;i<7;i++)
+        key[i]=(key[i]<<9)+(key[i+1]>>7);
+    
+    key[7]=(key[7]<<9)+temp;/*
+    uint64_t temp1=key[0];
+    uint64_t temp2=key[1];
+    key[0] = (temp1<<25) | temp2>>39;
+    key[1] = (temp2<<25) | temp1>>39;*/
+    
+}
 
 void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
 {
-    int i;
+    /*int i;
+    uint64_t temp1 = key[0];
+    uint64_t temp2 = key[1];
+    
+    for(i=0;i<14; i+=2)
+    {
+        subKey[i]=temp1;
+        subKey[i+1]= temp2;
+        temp1=(temp1<<25)MASK1;
+        temp2<<=25;
+        //temp1+= (subKey[i+1]) >> 38;
+        //temp2+= (subKey[i]) >> 38;
+    }*/
+    
+    /*int i;
     subKey[0] = key[0];
     subKey[1] = key[1];
     for(i = 3; i < 14; i+=2)//25 bit left shift
     {
-        subKey[i-1] = ((subKey[i-3]<<25)) | ((subKey[i-2]>>39));
-        subKey[i] = ((subKey[i-2]<<25)) | ((subKey[i-3]>>39));
+        subKey[i-1] = ((subKey[i-3]<<25)MASK1) | ((subKey[i-2]>>39)MASK2);
+        subKey[i] = ((subKey[i-2]<<25)MASK1) | ((subKey[i-3]>>39)MASK2);
+    }*/
+    uint64_t keyc[2];
+    keyc[0] = key[0];
+    keyc[1] = key[1];
+    
+    for(int i=0, j=0; i<7; i++, j+=2)
+    {
+        subKey[j]=keyc[0];
+        subKey[j+1] = keyc[1];
+        keyrotate((uint16_t *)keyc);
     }
-
 }
 
 //decryption subkey generator
