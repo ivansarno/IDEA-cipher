@@ -28,9 +28,6 @@
 #define __IDEA__IDEA__
 #include <stdint.h>
 
-//eliminare
-void IdeaRoutine(uint16_t *message, uint16_t *subKey);
-
 //single encryption, return 0 in case of error
 int IdeaEncrypt(uint64_t *message,uint64_t *key);
 
@@ -56,15 +53,10 @@ uint64_t IdeaCFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
 uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
 
 //return number of block processed
-uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
+uint64_t IdeaOFB(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
 
 //return number of block processed
-uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
+uint64_t IdeaCTR(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength);
 
-//return number of block processed
-uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength);
-
-//return number of block processed
-uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength);
 
 #endif /* defined(__IDEA__IDEA__) */

@@ -13,6 +13,10 @@
 #include "IDEA.h"
 #include <time.h>
 
+#define RED     "\x1b[31m"
+#define GREEN   "\x1b[32m"
+#define COLOR_RESET   "\x1b[0m"
+
 const int messageLength = 15;
 const int testPrecision = 25;
 
@@ -21,7 +25,6 @@ int main()
     srand((unsigned int)time(NULL));
     uint64_t message[messageLength];
     uint64_t messageCopy[messageLength];
-    uint64_t multiNonce[messageLength];
     int i,j;
     uint32_t keyInit[4];
     uint64_t nonce;
@@ -33,9 +36,6 @@ int main()
     keyInit[3] = rand();
 
     
-    for(j=0; j<messageLength; j++)
-        multiNonce[j] = rand();
-    
     for(i=0; i<testPrecision; i++)
     {
         message[0] = rand()*rand();
@@ -44,11 +44,16 @@ int main()
         IdeaDecrypt(message, key);
         if(message[0] != messageCopy[0])
         {
-            printf("Single ERROR\n");
+            printf(RED "Single ERROR\n" COLOR_RESET);
             return 1;
         }
     }
-    printf("Single Encription OK\n");
+    printf(GREEN "Single Encription OK\n" COLOR_RESET);
+    
+    keyInit[0] = rand();
+    keyInit[1] = rand();
+    keyInit[2] = rand();
+    keyInit[3] = rand();
     
     for(i=0; i<testPrecision; i++)
     {
@@ -59,11 +64,16 @@ int main()
         IdeaCBCDecrypt(message, key, nonce, messageLength);
         if(message[0] != messageCopy[0])
         {
-            printf("CBC ERROR\n");
+            printf(RED "CBC ERROR\n" COLOR_RESET);
             return 1;
         }
     }
-    printf("CBC Encription OK\n");
+    printf(GREEN "CBC Encription OK\n" COLOR_RESET);
+    
+    keyInit[0] = rand();
+    keyInit[1] = rand();
+    keyInit[2] = rand();
+    keyInit[3] = rand();
     
     for(i=0; i<testPrecision; i++)
     {
@@ -75,11 +85,16 @@ int main()
         for(j=0; j<messageLength; j++)
             if(message[0] != messageCopy[0])
             {
-                printf("PCBC ERROR\n");
+                printf(RED "PCBC ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf("PCBC Encription OK\n");
+    printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
+    
+    keyInit[0] = rand();
+    keyInit[1] = rand();
+    keyInit[2] = rand();
+    keyInit[3] = rand();
     
     for(i=0; i<testPrecision; i++)
     {
@@ -92,43 +107,53 @@ int main()
         for(j=0; j<messageLength; j++)
             if(message[0] != messageCopy[0])
             {
-                printf("CFB ERROR\n");
+                printf(RED "CFB ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf("CFB Encription OK\n");
+    printf(GREEN "CFB Encription OK\n" COLOR_RESET);
+    
+    keyInit[0] = rand();
+    keyInit[1] = rand();
+    keyInit[2] = rand();
+    keyInit[3] = rand();
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
         nonce = rand()*rand();
-        IdeaOFBEncrypt(message, key, nonce, messageLength);
-        IdeaOFBDecrypt(message, key, nonce, messageLength);
+        IdeaOFB(message, key, nonce, messageLength);
+        IdeaOFB(message, key, nonce, messageLength);
         for(j=0; j<messageLength; j++)
             if(message[0] != messageCopy[0])
             {
-                printf("OFB ERROR\n");
+                printf(RED  "OFB ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf("OFB Encription OK\n");
+    printf(GREEN "OFB Encription OK\n" COLOR_RESET);
+    
+    keyInit[0] = rand();
+    keyInit[1] = rand();
+    keyInit[2] = rand();
+    keyInit[3] = rand();
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        
-        IdeaCTREncrypt(message, key, multiNonce, messageLength);
-        IdeaCTRDecrypt(message, key, multiNonce, messageLength);
+        nonce =rand();
+        IdeaCTR(message, key, nonce, messageLength);
+        IdeaCTR(message, key, nonce, messageLength);
         for(j=0; j<messageLength; j++)
             if(message[0] != messageCopy[0])
             {
-                printf("CTR ERROR\n");
+                printf(RED "CTR ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf("CTR Encription OK\n");
+    printf(GREEN "CTR Encription OK\n" COLOR_RESET);
     
     return 0;
 }

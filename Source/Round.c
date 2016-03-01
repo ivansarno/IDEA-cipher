@@ -30,7 +30,7 @@ See official algorithm reference for more details
 #include "Round.h"
 
 
-uint16_t IdeaMultiplication(uint32_t a, uint32_t b)
+static inline uint16_t IdeaMultiplication(uint32_t a, uint32_t b)
 {
     const uint32_t mulModulus = 65537;
     const uint32_t addModulus = 65536;
@@ -42,7 +42,7 @@ uint16_t IdeaMultiplication(uint32_t a, uint32_t b)
 }
 
 
-void step1(uint16_t *message,uint16_t *key)
+static inline void step1(uint16_t *message, uint16_t *key)
 {
     message[0]=IdeaMultiplication(message[0],key[0]);
     message[1]=(message[1]+key[1]) ;
@@ -50,44 +50,44 @@ void step1(uint16_t *message,uint16_t *key)
     message[3]=IdeaMultiplication(message[3],key[3]);
 }
 
-void step2(uint16_t *message, uint16_t *temp)
+static inline void step2(uint16_t *message, uint16_t *temp)
 {
     temp[0]= (message[0]^message[2]);
     temp[1]= (message[1]^message[3]);
 }
 
-void step3(uint16_t *temp, uint16_t *key)
+static inline void step3(uint16_t *temp, uint16_t *key)
 {
     temp[0]= IdeaMultiplication(temp[0],key[4]);
     temp[1]= (temp[1]+temp[0]);
 }
 
-void step4(uint16_t *temp, uint16_t *key)
+static inline void step4(uint16_t *temp, uint16_t *key)
 {
     temp[1]= IdeaMultiplication(temp[1],key[5]);
-    temp[0]= (temp[1]+temp[0]);
+    temp[0]= temp[1] + temp[0];
 }
 
-void step5(uint16_t *message,uint16_t *temp)
+static inline void step5(uint16_t *message,uint16_t *temp)
 {
     message[0]=(message[0]^temp[1]);
     message[2]=(message[2]^temp[1]);
 }
 
-void step6(uint16_t *message,uint16_t *temp)
+static inline void step6(uint16_t *message,uint16_t *temp)
 {
     message[1]=(message[1]^temp[0]);
     message[3]=(message[3]^temp[0]);
 }
 
-void step7(uint16_t *message)
+static inline void step7(uint16_t *message)
 {
     uint16_t aus=message[1];
     message[1]=message[2];
     message[2]=aus;
 }
 
-void step8(uint16_t *message,uint16_t *key)
+static inline void step8(uint16_t *message, uint16_t *key)
 {
     message[0]=IdeaMultiplication(message[0],key[6]);
     message[1]=(message[1]+key[7]);

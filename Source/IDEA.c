@@ -29,7 +29,7 @@
 
 
 
-void IdeaRoutine(uint16_t *message, uint16_t *subKey)
+static inline void IdeaRoutine(uint16_t *message, uint16_t *subKey)
 {
     for (int i = 0; i<7; i++)
     {
@@ -228,7 +228,7 @@ uint64_t IdeaCFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
 
 
 //return number of block processed
-uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
+uint64_t IdeaOFB(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
 {
     if(!message || !key)
         return 0;
@@ -248,32 +248,10 @@ uint64_t IdeaOFBEncrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64
     SecureMemoryWipe((void *)subKey, 112);
     return i;
 }
+
 
 //return number of block processed
-uint64_t IdeaOFBDecrypt(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
-{
-    if(!message || !key)
-        return 0;
-
-    uint16_t subKey[56];
-    EncryptKeyCreate(key,(uint64_t *) subKey);
-
-    uint64_t i;
-
-    for(i=0; i<messageLength; i++)
-    {
-        IdeaRoutine((uint16_t *) &nonce, subKey);
-        message[i] ^= nonce;
-    }
-
-    SecureMemoryWipe((void *)subKey, 112);
-    return i;
-}
-
-
-
-//return number of block processed, destroy the nonce
-uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength)
+uint64_t IdeaCTR(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t messageLength)
 {
     if(!message || !key)
         return 0;
@@ -286,7 +264,7 @@ uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
 
     for(i=0; i<messageLength; i++)
     {
-        tempNonce = *nonce;
+        tempNonce = nonce;
         IdeaRoutine((uint16_t *) &tempNonce, subKey);
         *message ^= tempNonce;
         message++;
@@ -297,30 +275,6 @@ uint64_t IdeaCTREncrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint6
     return i;
 }
 
-//return number of block processed, destroy the nonce
-uint64_t IdeaCTRDecrypt(uint64_t *message, uint64_t *key, uint64_t *nonce, uint64_t messageLength)
-{
-    if(!message || !key)
-        return 0;
-
-    uint16_t subKey[56];
-    EncryptKeyCreate(key,(uint64_t *) subKey);
-    uint64_t tempNonce;
-
-    uint64_t i;
-
-    for(i=0; i<messageLength; i++)
-    {
-        tempNonce = *nonce;
-        IdeaRoutine((uint16_t *) &tempNonce, subKey);
-        *message ^= tempNonce;
-        message++;
-        nonce++;
-    }
-
-    SecureMemoryWipe((void *)subKey, 112);
-    return i;
-}
 
 
 

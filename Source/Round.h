@@ -30,7 +30,7 @@
 #define __IDEA__Round__
 #include <stdint.h>
 
-void Round(uint16_t *message,uint16_t *key);
-void FinalRound(uint16_t *message,uint16_t *key);
+void Round(uint16_t *message, uint16_t *key);
+void FinalRound(uint16_t *message, uint16_t *key);
 
 #endif /* defined(__IDEA__Round__) */

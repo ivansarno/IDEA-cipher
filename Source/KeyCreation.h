@@ -31,7 +31,7 @@ See official algorithm reference for more details
 #define __IDEA__Keycreate__
 #include <stdint.h>
 
-//aux fun to clean sensitive information;
+//aux fun to clean sensitive information, take size in bytes;
 void SecureMemoryWipe(void *pointer, uint64_t size);
 
 void EncryptKeyCreate(uint64_t *key, uint64_t *subKey);

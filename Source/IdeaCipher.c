@@ -38,7 +38,7 @@ const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
 int KeyStore(uint64_t *key)
 {
-    printf("KeyStore not avaiable");
+    printf("KeyStore not available");
     return 0;
 }
 
@@ -64,9 +64,9 @@ int Decription(uint64_t *message, uint64_t *key, uint64_t size)
 
 int GenAndEncrypt(uint64_t *message, uint64_t size, FILE *output)
 {
-    printf("GenAndEncrypt not avaiable");
+    printf("GenAndEncrypt not available");
     return 0;
-
+    
     /*uint64_t key[3];
     if(KeyStore(key) != 0)
     {
@@ -79,14 +79,14 @@ int GenAndEncrypt(uint64_t *message, uint64_t size, FILE *output)
         SecureMemoryWipe((void *)key, 24);
         return 3;
     }
-
+    
     if(fwrite(message, sizeof(uint64_t), size, output) != size)
     {
         printf("error on output writing\n");
         SecureMemoryWipe((void *)key, 24);
         return 3;
     }
-
+    
     SecureMemoryWipe((void *)key, 24);
     return 0;*/
 }
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
         printf("%s", manString);
         return 0;
     }
-
+    
     if(strcmp(argv[1], "-k") == 0)
     {
         uint64_t key[3];
@@ -112,13 +112,13 @@ int main(int argc, char **argv)
         SecureMemoryWipe((void *)key, 24);
         return result;
     }
-
+    
     if(argc < 3)
     {
         printf("%s", errorInputString);
         return 1;
     }
-
+    
     //file reading
     FILE *input = NULL;
     FILE *output = NULL;
@@ -126,12 +126,12 @@ int main(int argc, char **argv)
     input = fopen(argv[2], "rb");
     output = fopen("output", "wb");
 #endif
-
+    
 #ifdef SAFEIO
     fopen_s(&input,argv[2], "rb");
     fopen_s(&output,"output", "wb");
 #endif
-
+    
     if(!input || !output)
     {
         printf("Error: Can't open input or create output file.\n");
@@ -140,34 +140,35 @@ int main(int argc, char **argv)
 
     struct stat st;
     stat(argv[2], &st);
-    uint64_t size = (st.st_size) / 8 + 1;
-
-    uint64_t *message = (uint64_t *) malloc(size * sizeof(uint64_t));
+    size_t  byteSize = (size_t) st.st_size; //size in bytes
+    uint64_t intSize = (uint64_t)  (st.st_size) / 8 + 1; //size in 64 bit integers
+    
+    uint64_t *message = (uint64_t *) malloc(intSize * sizeof(uint64_t));
     if(!message)
     {
         printf("Error: memory allocation.\n");
         return 2;
     }
     //set padding to 0
-    message[size-2] = message[size-1] = 0;
-
-    if(fread(message, sizeof(char), st.st_size, input) != st.st_size)
+    message[intSize-2] = message[intSize-1] = 0;
+    
+    if(fread(message, sizeof(char), byteSize, input) != byteSize)
     {
         printf("Error: Can't read input file.\n");
         return 2;
     }
-
+    
     if(strcmp(argv[1], "-e") == 0 && argc==3)
     {
         int result;
-        result = GenAndEncrypt(message, size, output);
-
+        result = GenAndEncrypt(message, intSize, output);
+        
         fclose(input);
         fclose(output);
         free(message);
         return result;
     }
-
+    
     if(argc < 4)
     {
         printf("%s", errorInputString);
@@ -182,11 +183,11 @@ int main(int argc, char **argv)
 #ifndef SAFEIO
     keyFile = fopen(argv[3], "rb");
 #endif
-
+    
 #ifdef SAFEIO
     fopen_s(&keyFile,argv[3], "rb");
 #endif
-
+    
     if(!keyFile || (fread(key, sizeof(uint64_t), 3, keyFile) != 3))
     {
         printf("Error: Can't read key file.\n");
@@ -194,12 +195,12 @@ int main(int argc, char **argv)
         free(message);
         return 2;
     }
-
+    
     int result;
     if(strcmp(argv[1], "-e") == 0)
-        result = Encryption(message, key, size);
+        result = Encryption(message, key, intSize);
     else if(strcmp(argv[1], "-d") == 0)
-        result = Decription(message, key, size);
+        result = Decription(message, key, intSize);
         else
         {
             printf("%s", errorInputString);
@@ -207,21 +208,21 @@ int main(int argc, char **argv)
             SecureMemoryWipe((void *)key, 24);
             return 1;
         }
-
+    
     if(result==0)
         //output writing
-        if(fwrite(message, sizeof(uint64_t), size, output) != size)
+        if(fwrite(message, sizeof(uint64_t), intSize, output) != intSize)
         {
             result = 3;
             printf("error on output writing\n");
         }
-
+    
     SecureMemoryWipe((void *)key, 24);
     fclose(keyFile);
     fclose(input);
     fclose(output);
     free(message);
     return result;
-
-
+ 
+ 
 }

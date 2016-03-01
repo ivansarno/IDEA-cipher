@@ -30,14 +30,14 @@ See official algorithm reference for more details
 #include "KeyCreation.h"
 
 //add inverse operator
-uint16_t AddInverse(uint16_t number)
+static inline uint16_t AddInverse(uint16_t number)
 {
     const uint32_t addModulus = 65536;
     return (uint16_t) addModulus-number;
 }
 
 //mul inverse operator
-uint16_t MulInverse(uint16_t number)
+static uint16_t MulInverse(uint16_t number)
 {
     const uint32_t mulModulus = 65537;
     int j = 1;
@@ -70,6 +70,7 @@ uint16_t MulInverse(uint16_t number)
         return (uint16_t) result;
     else return (uint16_t) (mulModulus + result);
 }
+
 //eliminare
 void keyrotate(uint16_t *key)
 {
@@ -93,28 +94,6 @@ void keyrotate(uint16_t *key)
 
 void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
 {
-    /*int i;
-    uint64_t temp1 = key[0];
-    uint64_t temp2 = key[1];
-    
-    for(i=0;i<14; i+=2)
-    {
-        subKey[i]=temp1;
-        subKey[i+1]= temp2;
-        temp1=(temp1<<25)MASK1;
-        temp2<<=25;
-        //temp1+= (subKey[i+1]) >> 38;
-        //temp2+= (subKey[i]) >> 38;
-    }*/
-    
-    /*int i;
-    subKey[0] = key[0];
-    subKey[1] = key[1];
-    for(i = 3; i < 14; i+=2)//25 bit left shift
-    {
-        subKey[i-1] = ((subKey[i-3]<<25)MASK1) | ((subKey[i-2]>>39)MASK2);
-        subKey[i] = ((subKey[i-2]<<25)MASK1) | ((subKey[i-3]>>39)MASK2);
-    }*/
     uint64_t keyc[2];
     keyc[0] = key[0];
     keyc[1] = key[1];
@@ -161,10 +140,10 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
 //aux fun to clean sensitive information;
 void SecureMemoryWipe(void *pointer, uint64_t size)
 {
-    volatile uint8_t *p = (volatile uint8_t *)pointer;
+    volatile uint8_t *temp = (volatile uint8_t *)pointer;
     uint64_t i;
     for(i=0; i<size; i++)
     {
-        p[i] = 0;
+        temp[i] = 0;
     }
 }
