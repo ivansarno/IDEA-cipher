@@ -1,7 +1,7 @@
 CFLAG = -std=c11 -O3
 
-IdeaCipher : IdeaCipher.o IDEA.o KeyCreation.o Round.o
+IdeaCipher : IdeaCipher.o IdeaLib.o KeyCreation.o Round.o
 
-IdeaLib :  IDEA.o KeyCreation.o Round.o
+IdeaLib :  IdeaLib.o KeyCreation.o Round.o
 
-Test : Test.o IDEA.o KeyCreation.o Round.o
+Test : Test.o IdeaLib.o KeyCreation.o Round.o

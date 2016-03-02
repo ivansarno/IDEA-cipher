@@ -1,30 +1,40 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno.
 /*
- This file is part of IDEA-cipher library
- IDEA-cipher  is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
+ This file is part of IdeaCipher library
+ IdeaCipher  is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
- IDEA-cipher  is distributed in the hope that it will be useful,
+ IdeaCipher  is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+ General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with IDEA-cipher ; if not, write to the Free Software
+ You should have received a copy of the GNU General Public
+ License along with IdeaCipher ; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
 //Version V.2.0
 
+#ifdef _WIN32
+#define _CRT_RAND_S
+#define SAFEIO
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "IDEA.h"
+#include "IdeaLib.h"
 #include "KeyCreation.h"
 #include <string.h>
 #include <sys/stat.h>
+
+#ifndef _WIN32
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 
 
 const char *manString = " IdeaCipher -h: print this man.\n \
@@ -36,15 +46,65 @@ IdeaCipher -d inputFile keyFile: decrypt inputFile and create the ouptput file i
 
 const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
+int SystemRandom(uint64_t *buffer)
+{
+#ifdef _WIN32
+    uint32_t *buff32 = (uint32_t *) buffer;
+    for(int i=0; i<6; i++)
+        if(rand_s(buff32))
+            buff32++;
+        else return 1;
+    return 0;
+#endif
+    
+    int randomSource = open("/dev/random", O_RDONLY);
+    if(read(randomSource, buffer, 24) !=24)
+        return 1;
+    
+    close(randomSource);
+    
+    return 0;
+}
+
 int KeyStore(uint64_t *key)
 {
-    printf("KeyStore not available");
+    
+    if(SystemRandom(key) != 0)
+    {
+        printf("Error: key generation fail\n");
+        return 2;
+    }
+    
+    FILE *keyFile = NULL;
+
+#ifndef SAFEIO
+    keyFile = fopen("key", "wb");
+#endif
+    
+#ifdef SAFEIO
+    fopen_s(&keyFile,"key", "wb");
+#endif
+
+    if(keyFile == NULL)
+    {
+        printf("Error: can't create key file\n");
+        return 2;
+    }
+    
+    if(fwrite(key, sizeof(uint64_t), 3, keyFile) != 3)
+    {
+        printf("Error: key writing fail\n");
+        
+        fclose(keyFile);
+        return 3;
+    }
+    fclose(keyFile);
     return 0;
 }
 
 int Encryption(uint64_t *message, uint64_t *key, uint64_t size)
 {
-    if(IdeaCBCEncrypt(message, key, key[2], size) == size)
+    if(IdeaCBCEncrypt(message, key, key[2], size) != size)
     {
         printf("Error: encyption fail\n");
         return 3;
@@ -54,9 +114,9 @@ int Encryption(uint64_t *message, uint64_t *key, uint64_t size)
 
 int Decription(uint64_t *message, uint64_t *key, uint64_t size)
 {
-     if(IdeaCBCDecrypt(message, key, key[2], size) == size)
+     if(IdeaCBCDecrypt(message, key, key[2], size) != size)
      {
-     printf("Error: encyption fail\n");
+     printf("Error: decyption fail\n");
      return 3;
      }
      return 0;
@@ -64,10 +124,7 @@ int Decription(uint64_t *message, uint64_t *key, uint64_t size)
 
 int GenAndEncrypt(uint64_t *message, uint64_t size, FILE *output)
 {
-    printf("GenAndEncrypt not available");
-    return 0;
-    
-    /*uint64_t key[3];
+    uint64_t key[3];
     if(KeyStore(key) != 0)
     {
         printf("Error: key generation fail\n");
@@ -88,7 +145,7 @@ int GenAndEncrypt(uint64_t *message, uint64_t size, FILE *output)
     }
     
     SecureMemoryWipe((void *)key, 24);
-    return 0;*/
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -222,7 +279,6 @@ int main(int argc, char **argv)
     fclose(input);
     fclose(output);
     free(message);
+    
     return result;
- 
- 
 }
