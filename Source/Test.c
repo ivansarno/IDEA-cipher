@@ -19,7 +19,7 @@
 
 const int messageLength = 15;
 const int testPrecision = 25;
-
+/*
 int main()
 {
     srand((unsigned int)time(NULL));
@@ -29,13 +29,13 @@ int main()
     uint32_t keyInit[4];
     uint64_t nonce;
     uint64_t *key=(uint64_t *)keyInit;
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
 
-
+    
     for(i=0; i<testPrecision; i++)
     {
         message[0] = rand()*rand();
@@ -49,12 +49,12 @@ int main()
         }
     }
     printf(GREEN "Single Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -69,12 +69,12 @@ int main()
         }
     }
     printf(GREEN "CBC Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -90,12 +90,12 @@ int main()
             }
     }
     printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -112,12 +112,12 @@ int main()
             }
     }
     printf(GREEN "CFB Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -133,12 +133,12 @@ int main()
             }
     }
     printf(GREEN "OFB Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -154,6 +154,18 @@ int main()
             }
     }
     printf(GREEN "CTR Encription OK\n" COLOR_RESET);
-
+    
     return 0;
-}
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
