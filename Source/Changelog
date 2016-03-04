@@ -1,0 +1,7 @@
+Version V.2.0
+
+1)Completely rewritten to improve clarity, safety and performance.
+2)Cipher Block Mode support.
+3)Size of file parameter now is not necessary
+4)Makefile and Test program
+5)Memory wipe for sensitive information.

@@ -3,19 +3,30 @@ IDEA-cipher
 
 IDEA cryptography algorithm implementation
 
-IDEA-cipher is a stand alone program with this command line syntax:
+**IdeaCipher**
 
-	IDEA cmd number_of_bytes input_file key_file
-	
-	when cmd is: -e to encrypt or -d to decrypt
-	and key_file contains a random key of 128 bits
+IdeaCipher is a stand alone command-line program that provides encryption/decryption of a file and key creation.  
+Run "IdeaCipher -h" for complete man.
 
-the program creates the output file in current directory.
+**IdeaLib**
 
-IDEA.h contains a set of functions that implement IDEA algorithm for every need
+IdeaLib provides a implementation of IDEA algorithm for every need:
 
-**Compiler Warning**
+	-Key creation function
+	-Encryption/Decryption functions
+	-Cipher Block Modes: CBC, PCBC, CFB, OFB, CTR
+  
+  
+**Other**
 
+The library is accompanied by:
+
+	-Test program: to verify the proper functioning of the library
+	-Makefile, with target: IdeaCipher, IdeaLib, Test, DebugIdeaCipher, DebugIdeaLib, DebugTest
+  
+Compiler Warning
+
+Recommended C dialect: C11  
 If your compiler reports warning or error for deprecated I/O function, define SAFEIO macro to solve
 
 
