@@ -1,27 +1,27 @@
 //  Created by ivan sarno on 02/12/14.
 //  Copyright (c) 2014 ivan sarno.
 /*
- This file is part of IdeaCipher library
- IdeaCipher  is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public
- License as published by the Free Software Foundation; either
- version 3 of the License, or (at your option) any later version.
-
- IdeaCipher  is distributed in the hope that it will be useful,
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- General Public License for more details.
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- You should have received a copy of the GNU General Public
- License along with IdeaCipher ; if not, write to the Free Software
- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
- USA
  */
 //Version V.2.0
 
 #ifdef _WIN32
 #define _CRT_RAND_S
 #define SAFEIO
+
+#else
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 
 #include <stdio.h>
@@ -31,10 +31,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifndef _WIN32
-#include <fcntl.h>
-#include <unistd.h>
-#endif
 
 
 const char *manString = " IdeaCipher -h: print this man.\n \
@@ -55,7 +51,7 @@ int SystemRandom(uint64_t *buffer)
             buff32++;
         else return 1;
     return 0;
-#endif
+#else
     
     int randomSource = open("/dev/random", O_RDONLY);
     if(read(randomSource, buffer, 24) !=24)
@@ -64,6 +60,7 @@ int SystemRandom(uint64_t *buffer)
     close(randomSource);
     
     return 0;
+#endif
 }
 
 int KeyWrite(uint64_t *key)
@@ -72,9 +69,8 @@ int KeyWrite(uint64_t *key)
 
 #ifndef SAFEIO
     keyFile = fopen("key", "wb");
-#endif
     
-#ifdef SAFEIO
+#else
     fopen_s(&keyFile,"key", "wb");
 #endif
     
@@ -102,9 +98,7 @@ int KeyRead(char *keyFileName, uint64_t *key)
     
 #ifndef SAFEIO
     keyFile = fopen(keyFileName, "rb");
-#endif
-    
-#ifdef SAFEIO
+#else
     fopen_s(&keyFile,keyFileName, "rb");
 #endif
     
@@ -135,9 +129,7 @@ uint64_t *MessageRead(char *messageFileName)
     FILE *input = NULL;
 #ifndef SAFEIO
     input = fopen(messageFileName, "rb");
-#endif
-    
-#ifdef SAFEIO
+#else
     fopen_s(&input,messageFileName, "rb");
 #endif
     
@@ -183,9 +175,7 @@ int MessageWrite(uint64_t *message, uint64_t byteSize)
     FILE *output = NULL;
 #ifndef SAFEIO
     output = fopen("output", "wb");
-#endif
-    
-#ifdef SAFEIO
+#else
     fopen_s(&output,"output", "wb");
 #endif
     
