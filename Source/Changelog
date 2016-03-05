@@ -1,3 +1,8 @@
+Version V.2.1
+
+1)Random Number Generators based on IDEA
+2)KeyCheck fun: verify if the key is a valid key to be used with IDEA
+
 Version V.2.0
 
 1)Completely rewritten to improve clarity, safety and performance.
