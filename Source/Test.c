@@ -5,7 +5,7 @@
 //  Created by ivan sarno on 23/02/16.
 //  Copyright © 2016 ivan sarno. All rights reserved.
 //
-//V.2.0
+//V.2.1
 
 #include <stdio.h>
 #include <stdlib.h>

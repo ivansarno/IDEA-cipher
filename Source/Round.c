@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.0
+//Version V.2.1
 /*
 Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, multiplication operation is ad hoc for the algorithm.
 See official algorithm reference for more details

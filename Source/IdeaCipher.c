@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.0
+//Version V.2.1
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -52,13 +52,13 @@ int SystemRandom(uint64_t *buffer)
         else return 1;
     return 0;
 #else
-    
+
     int randomSource = open("/dev/random", O_RDONLY);
     if(read(randomSource, buffer, 24) !=24)
         return 1;
-    
+
     close(randomSource);
-    
+
     return 0;
 #endif
 }
@@ -69,25 +69,25 @@ int KeyWrite(uint64_t *key)
 
 #ifndef SAFEIO
     keyFile = fopen("key", "wb");
-    
+
 #else
     fopen_s(&keyFile,"key", "wb");
 #endif
-    
+
     if(keyFile == NULL)
     {
         printf("Error: can't create key file\n");
         return 2;
     }
-    
+
     if(fwrite(key, sizeof(uint64_t), 3, keyFile) != 3)
     {
         printf("Error: key writing fail\n");
-        
+
         fclose(keyFile);
         return 3;
     }
-    
+
     fclose(keyFile);
     return 0;
 }
@@ -95,31 +95,35 @@ int KeyWrite(uint64_t *key)
 int KeyRead(char *keyFileName, uint64_t *key)
 {
     FILE *keyFile = NULL;
-    
+
 #ifndef SAFEIO
     keyFile = fopen(keyFileName, "rb");
 #else
     fopen_s(&keyFile,keyFileName, "rb");
 #endif
-    
+
     if(!keyFile || (fread(key, sizeof(uint64_t), 3, keyFile) != 3))
     {
         printf("Error: Can't read key file.\n");
         SecureMemoryWipe((void *)key, 24);
         return 2;
     }
-    
+
     fclose(keyFile);
     return 0;
 }
 
 static inline int KeyGen(uint64_t *key)
 {
-    if(SystemRandom(key) != 0)
+    do
     {
-        printf("Error: key generation fail\n");
-        return 2;
-    }
+        if(SystemRandom(key) != 0)
+        {
+            printf("Error: key generation fail\n");
+            return 2;
+        }
+    }while(!KeyCheck(key));
+
     return 0;
 }
 
@@ -132,18 +136,18 @@ uint64_t *MessageRead(char *messageFileName)
 #else
     fopen_s(&input,messageFileName, "rb");
 #endif
-    
+
     if(!input)
     {
         printf("Error: Can't open input.\n");
         return NULL;
     }
-    
+
     struct stat st;
     stat(messageFileName, &st);
     uint64_t byteSize = (uint64_t) st.st_size; //size in bytes
     uint64_t intSize = (uint64_t)  (st.st_size) / 8 + 1; //size in 64 bit integers
-    
+
     //first 2 values of message contain size in bytes and integer of the message
     uint64_t *message = (uint64_t *) malloc((intSize + 2) * sizeof(uint64_t));
     if(!message)
@@ -154,7 +158,7 @@ uint64_t *MessageRead(char *messageFileName)
     }
     //set padding to 0
     message[intSize] = message[intSize+1] = 0;
-    
+
     if(fread(message+2, sizeof(uint8_t), byteSize, input) != byteSize)
     {
         printf("Error: Can't read input file.\n");
@@ -162,10 +166,10 @@ uint64_t *MessageRead(char *messageFileName)
         fclose(input);
         return NULL;
     }
-    
+
     message[0] = intSize;
     message[1] = byteSize;
-    
+
     fclose(input);
     return message;
 }
@@ -178,20 +182,20 @@ int MessageWrite(uint64_t *message, uint64_t byteSize)
 #else
     fopen_s(&output,"output", "wb");
 #endif
-    
+
     if(!output)
     {
         printf("Error: Can't create output file.\n");
         return 2;
     }
-    
+
     if(fwrite(message, sizeof(uint8_t), byteSize, output) != byteSize)
     {
         printf("error on output writing\n");
         fclose(output);
         return 3;
     }
-    
+
     fclose(output);
     return 0;
 }
@@ -199,10 +203,10 @@ int MessageWrite(uint64_t *message, uint64_t byteSize)
 static inline int GenAndStore()
 {
     uint64_t key[3];
-    
+
     if(KeyGen(key))
         return 1;
-    
+
     if(KeyWrite(key))
     {
         SecureMemoryWipe(key, 24);
@@ -214,17 +218,17 @@ static inline int GenAndStore()
 int GenAndEncrypt(char *messageFileName)
 {
     uint64_t *message=MessageRead(messageFileName);
-    
+
     if(!message)
         return 1;
-    
+
     uint64_t key[3];
     if(KeyGen(key))
     {
         free(message);
         return 1;
     }
-    
+
     //first 2 values of message contain size in bytes and integer of the message
     if(IdeaCBCEncrypt(message+2, key, key[2], message[0]) != message[0])
     {
@@ -233,7 +237,7 @@ int GenAndEncrypt(char *messageFileName)
         free(message);
         return 2;
     }
-    
+
     //write origial file size in bytes to remove padding in decryption
     if(MessageWrite(message+1, (message[0]+1)*8))
     {
@@ -241,14 +245,14 @@ int GenAndEncrypt(char *messageFileName)
         free(message);
         return 3;
     }
-    
+
     free(message);
     if(KeyWrite(key))
     {
         SecureMemoryWipe(key, 3);
         return 3;
     }
-    
+
     SecureMemoryWipe(key, 3);
     return 0;
 }
@@ -256,17 +260,17 @@ int GenAndEncrypt(char *messageFileName)
 int Encrypt(char *messageFileName, char *keyFileName)
 {
     uint64_t *message=MessageRead(messageFileName);
-    
+
     if(!message)
         return 1;
-    
+
     uint64_t key[3];
     if(KeyRead(keyFileName, key))
     {
         free(message);
         return 1;
     }
-    
+
     //first 2 values of message contain size in bytes and integer of the message
     if(IdeaCBCEncrypt(message+2, key, key[2], message[0]) != message[0])
     {
@@ -275,7 +279,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
         free(message);
         return 2;
     }
-    
+
     //write origial file size in bytes to remove padding in decryption
     if(MessageWrite(message+1, (message[0]+1)*8))
     {
@@ -283,7 +287,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
         free(message);
         return 3;
     }
-    
+
     free(message);
     SecureMemoryWipe(key, 3);
     return 0;
@@ -292,17 +296,17 @@ int Encrypt(char *messageFileName, char *keyFileName)
 int Decrypt(char *messageFileName, char *keyFileName)
 {
     uint64_t *message=MessageRead(messageFileName);
-    
+
     if(!message)
         return 1;
-    
+
     uint64_t key[3];
     if(KeyRead(keyFileName, key))
     {
         free(message);
         return 1;
     }
-    
+
     //first 2 values of message contain size in bytes and integer of the message
     if(IdeaCBCDecrypt(message+3, key, key[2], message[0]-1) != message[0]-1)
     {
@@ -311,7 +315,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
         free(message);
         return 2;
     }
-    
+
     //uising information stored in encryption phase to remove de padding
     if(MessageWrite(message+3, message[2]))
     {
@@ -319,7 +323,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
         free(message);
         return 3;
     }
-    
+
     free(message);
     SecureMemoryWipe(key, 3);
     return 0;
@@ -339,20 +343,20 @@ int main(int argc, char **argv)
         printf("%s", manString);
         return 0;
     }
-    
+
     if(strcmp(argv[1], "-k") == 0)
         return GenAndStore();
-    
+
     if(strcmp(argv[1], "-e") == 0 && argc==3)
         return GenAndEncrypt(argv[2]);
-    
+
     if(strcmp(argv[1], "-e") == 0 && argc==4)
         return Encrypt(argv[2], argv[3]);
-    
+
     if(strcmp(argv[1], "-d") == 0 && argc==4)
         return Decrypt(argv[2], argv[3]);
-    
+
     printf("%s", errorInputString);
-    
+
     return 1;
 }

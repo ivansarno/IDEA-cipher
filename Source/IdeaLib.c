@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
 */
-//Version V.2.0
+//Version V.2.1
 
 #include "IdeaLib.h"
 #include "Round.h"
@@ -273,6 +273,15 @@ uint64_t IdeaCTR(uint64_t *message, uint64_t *key, uint64_t nonce, uint64_t mess
 
     SecureMemoryWipe((void *)subKey, 112);
     return i;
+}
+
+int KeyCheck(uint64_t *key)
+{
+    uint16_t *temp = (uint16_t *)key;
+    for(int i=0; i<8; i++)
+        if(temp[i] == 0)
+            return 0;
+    return 1;
 }
 
 

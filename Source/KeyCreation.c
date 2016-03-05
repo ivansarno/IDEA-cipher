@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.0
+//Version V.2.1
 /*
 implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
@@ -71,8 +71,8 @@ static uint16_t MulInverse(uint16_t number)
     else return (uint16_t) (mulModulus + result);
 }
 
-//not final, but works
-void keyrotate(uint16_t *key)
+//25 bit left shitf
+static inline void keyrotate(uint16_t *key)
 {
     int i;
     uint16_t temp=key[0];
@@ -84,17 +84,12 @@ void keyrotate(uint16_t *key)
     for(i=0;i<7;i++)
         key[i]=(key[i]<<9)+(key[i+1]>>7);
     
-    key[7]=(key[7]<<9)+temp;/*
-    uint64_t temp1=key[0];
-    uint64_t temp2=key[1];
-    key[0] = (temp1<<25) | temp2>>39;
-    key[1] = (temp2<<25) | temp1>>39;*/
-    
+    key[7]=(key[7]<<9)+temp;
 }
 
 void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
 {
-    uint64_t keyc[2];
+    uint64_t keyc[2];//key local copy
     keyc[0] = key[0];
     keyc[1] = key[1];
     
