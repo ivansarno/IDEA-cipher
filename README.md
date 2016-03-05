@@ -15,6 +15,7 @@ IdeaLib provides a implementation of IDEA algorithm for every need:
 	-Key creation function
 	-Encryption/Decryption functions
 	-Cipher Block Modes: CBC, PCBC, CFB, OFB, CTR
+	-Random Number Generator based on IDEA
   
   
 **Other**
