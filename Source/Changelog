@@ -1,3 +1,9 @@
+Version V.2.2
+
+1) WIN32 platform specific memory wipe
+2) Random number generation in IdeaCipher
+3) Makefile fix
+
 Version V.2.1
 
 1)Random Number Generators based on IDEA

@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.1
+//Version V.2.2
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -38,7 +38,9 @@ IdeaCipher --help: print this man.\n \
 IdeaCipher -k: creates a 128 bits key and a 64 bit nonce ad stores these in a file called key in the current directory.\n \
 IdeaCipher -e inputFile: encrypt inputFile and creates the ouptput file and key file in the current directory. key file contains 172 random bit for key and nonce.\n \
 IdeaCipher -e inputFile keyFile: encrypt inputFile and creates the ouptput file in the current directory, keyFile must contains 172 random bit for key and nonce.\n \
-IdeaCipher -d inputFile keyFile: decrypt inputFile and create the ouptput file in the current directory. keyFile must contains 172 random bit for key and nonce.\n";
+IdeaCipher -d inputFile keyFile: decrypt inputFile and create the ouptput file in the current directory. keyFile must contains 172 random bit for key and nonce.\n \
+IdeaCipher -r numberOfBytes: store numberOfBytes cryptography safe random bytes in the ouptput file in the current directory.\n";
+
 
 const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
@@ -200,6 +202,7 @@ int MessageWrite(uint64_t *message, uint64_t byteSize)
     return 0;
 }
 
+
 static inline int GenAndStore()
 {
     uint64_t key[3];
@@ -249,11 +252,11 @@ int GenAndEncrypt(char *messageFileName)
     free(message);
     if(KeyWrite(key))
     {
-        SecureMemoryWipe(key, 3);
+        SecureMemoryWipe(key, 24);
         return 3;
     }
 
-    SecureMemoryWipe(key, 3);
+    SecureMemoryWipe(key, 24);
     return 0;
 }
 
@@ -289,7 +292,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
     }
 
     free(message);
-    SecureMemoryWipe(key, 3);
+    SecureMemoryWipe(key, 24);
     return 0;
 }
 
@@ -325,9 +328,43 @@ int Decrypt(char *messageFileName, char *keyFileName)
     }
 
     free(message);
-    SecureMemoryWipe(key, 3);
+    SecureMemoryWipe(key, 24);
     return 0;
 }
+
+
+int RandomGeneration(uint64_t number)
+{
+    if(number == 0)
+        return 0;
+
+    uint64_t key[3];
+    if(SystemRandom(key))
+    {
+        printf("Error: Random Number Generation Fail\n");
+        return 1;
+    }
+
+    uint8_t *buffer = (uint8_t *) malloc(number * sizeof(uint8_t));
+
+    if(!buffer)
+        return 1;
+
+    IdeaGeneratorStatus status = IdeaGeneratorInit(key, key[2], 500);
+
+    IdeaIterativeGenFill(status, buffer, number);
+
+    IdeaGeneratorDelete(status);
+
+    if(MessageWrite((uint64_t *)buffer, number))
+        return 2;
+
+    SecureMemoryWipe(buffer, number);
+
+    free(buffer);
+    return 0;
+}
+
 
 ////////////
 int main(int argc, char **argv)
@@ -355,6 +392,9 @@ int main(int argc, char **argv)
 
     if(strcmp(argv[1], "-d") == 0 && argc==4)
         return Decrypt(argv[2], argv[3]);
+
+    if(strcmp(argv[1], "-r") == 0 && argc==3)
+        return RandomGeneration(atoi(argv[2]));
 
     printf("%s", errorInputString);
 

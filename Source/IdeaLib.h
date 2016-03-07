@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.1
+//Version V.2.2
 //complete set of fun that implement IDEA algorithm
 
 #ifndef __IdeaLib__IdeaLib__
@@ -80,13 +80,13 @@ uint64_t IdeaIterativeGenInteger(IdeaGeneratorStatus status);
 //Use it for statistic application, not for cryptography.
 uint64_t IdeaIterativeGenUnsafe(IdeaGeneratorStatus status);
 
-//Fill a buffer of cryptography safe random bytes
+//Fill a buffer of cryptography safe random bytes. Return 0 in case of error.
 int IdeaIterativeGenFill(IdeaGeneratorStatus status, uint8_t *buffer, unsigned long long length);
 
 //Return a cryptography safe random 64 bit integer
 uint64_t IdeaCounterGenInteger(IdeaGeneratorStatus status);
 
-//Fill a buffer of cryptography safe random 64 bit integer.
+//Fill a buffer of cryptography safe random 64 bit integer. Return 0 in case of error.
 int IdeaCounterGenFill(IdeaGeneratorStatus status, uint64_t *buffer, unsigned long long length);
 
 #endif /* defined(__IdeaLib__IdeaLib__) */

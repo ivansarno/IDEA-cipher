@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.1
+//Version V.2.2
 /*
 Implementation of round of IDEA algorithm, divided in steps for clarity and simplicity, multiplication operation is ad hoc for the algorithm.
 See official algorithm reference for more details
@@ -29,11 +29,11 @@ See official algorithm reference for more details
 
 #include "Round.h"
 
+static const uint32_t mulModulus = 65537;
+static const uint32_t addModulus = 65536;
 
 static inline uint16_t IdeaMultiplication(uint32_t a, uint32_t b)
 {
-    const uint32_t mulModulus = 65537;
-    const uint32_t addModulus = 65536;
     if(a==0)
         a=addModulus;
     if(b==0)
@@ -122,5 +122,4 @@ void FinalRound(uint16_t *message,uint16_t *key)
     step5(message,temp);
     step6(message,temp);
     step8(message,key);
-
 }

@@ -21,25 +21,31 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.1
+//Version V.2.2
 /*
 implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
 #include "KeyCreation.h"
+#ifdef _WIN32
+#include <WinBase.h>
+#endif
+
+static const uint32_t mulModulus = 65537;
+static const uint32_t addModulus = 65536;
+static const int roundNumber = 7;
+static const int subKeyNumber = 56;
 
 //add inverse operator
 static inline uint16_t AddInverse(uint16_t number)
 {
-    const uint32_t addModulus = 65536;
     return (uint16_t) addModulus-number;
 }
 
 //mul inverse operator
 static uint16_t MulInverse(uint16_t number)
 {
-    const uint32_t mulModulus = 65537;
     int j = 1;
     int64_t result, temp, intermediate;
     int64_t buffer[35];//35 is an upper bound for intermediate result of a inversion of a 16 bits integer
@@ -93,7 +99,7 @@ void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
     keyc[0] = key[0];
     keyc[1] = key[1];
     
-    for(int i=0, j=0; i<7; i++, j+=2)
+    for(int i=0, j=0; i<roundNumber; i++, j+=2)
     {
         subKey[j]=keyc[0];
         subKey[j+1] = keyc[1];
@@ -104,7 +110,7 @@ void EncryptKeyCreate(uint64_t *key, uint64_t *subKey)
 //decryption subkey generator
 void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
 {
-    uint16_t tempKey[56];
+    uint16_t tempKey[subKeyNumber];
     int i;
 
     EncryptKeyCreate(key,(uint64_t *)tempKey);
@@ -118,7 +124,7 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
     tempKey[1]=tempKey[2];
     tempKey[2]=t;
 
-
+//set remaining subkeys
     for(i=0;i<48;i+=6)
     {
         subKey[4+i]=tempKey[46-i];
@@ -129,16 +135,21 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
         subKey[9+i]=MulInverse(tempKey[45-i]);
     }
 
-    SecureMemoryWipe((void *) tempKey, 112);
+    SecureMemoryWipe((void *) tempKey, subKeyNumber * sizeof(uint16_t));
 }
 
 //aux fun to clean sensitive information;
 void SecureMemoryWipe(void *pointer, uint64_t size)
 {
+#ifdef _WIN32
+    SecureZeroMemory(pointer, size);
+#else
+    
     volatile uint8_t *temp = (volatile uint8_t *)pointer;
     uint64_t i;
     for(i=0; i<size; i++)
     {
         temp[i] = 0;
     }
+#endif
 }

@@ -3,9 +3,25 @@
 //  IdeaLib
 //
 //  Created by ivan sarno on 23/02/16.
-//  Copyright © 2016 ivan sarno. All rights reserved.
-//
-//V.2.1
+//  Copyright © 2016 ivan sarno.
+/*
+ This file is part of IdeaLib library
+ IdeaLib  is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ IdeaLib  is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with IdeaLib ; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ USA
+ */
+//Version V.2.2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +34,8 @@
 #define GREEN   "\x1b[32m"
 #define COLOR_RESET   "\x1b[0m"
 
-const int messageLength = 15;
-const int testPrecision = 25;
+static const int messageLength = 15;
+static const int testPrecision = 25;
 
 int main()
 {
@@ -30,13 +46,13 @@ int main()
     uint32_t keyInit[4];
     uint64_t nonce;
     uint64_t *key=(uint64_t *)keyInit;
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
 
-
+    
     for(i=0; i<testPrecision; i++)
     {
         message[0] = rand()*rand();
@@ -50,12 +66,12 @@ int main()
         }
     }
     printf(GREEN "Single Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -70,12 +86,12 @@ int main()
         }
     }
     printf(GREEN "CBC Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -91,12 +107,12 @@ int main()
             }
     }
     printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -113,12 +129,12 @@ int main()
             }
     }
     printf(GREEN "CFB Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -134,12 +150,12 @@ int main()
             }
     }
     printf(GREEN "OFB Encription OK\n" COLOR_RESET);
-
+    
     keyInit[0] = rand();
     keyInit[1] = rand();
     keyInit[2] = rand();
     keyInit[3] = rand();
-
+    
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
@@ -155,6 +171,18 @@ int main()
             }
     }
     printf(GREEN "CTR Encription OK\n" COLOR_RESET);
-
+    
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
