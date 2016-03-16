@@ -21,21 +21,18 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.2
+//Version V.2.2.1
 /*
 implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details
 */
 
 #include "KeyCreation.h"
-#ifdef _WIN32
-#include <WinBase.h>
-#endif
 
-static const uint32_t mulModulus = 65537;
-static const uint32_t addModulus = 65536;
-static const int roundNumber = 7;
-static const int subKeyNumber = 56;
+#define mulModulus 65537
+#define addModulus 65536
+#define roundNumber 7
+#define subKeyNumber 56
 
 //add inverse operator
 static inline uint16_t AddInverse(uint16_t number)
@@ -141,15 +138,10 @@ void DecryptKeyCreate(uint64_t *key,uint16_t *subKey)
 //aux fun to clean sensitive information;
 void SecureMemoryWipe(void *pointer, uint64_t size)
 {
-#ifdef _WIN32
-    SecureZeroMemory(pointer, size);
-#else
-    
-    volatile uint8_t *temp = (volatile uint8_t *)pointer;
+	volatile uint8_t *temp = (volatile uint8_t *)pointer;
     uint64_t i;
     for(i=0; i<size; i++)
     {
         temp[i] = 0;
     }
-#endif
 }

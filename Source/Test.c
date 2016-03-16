@@ -21,11 +21,10 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.2
+//Version V.2.2.1
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include "IdeaLib.h"
 #include <time.h>
@@ -34,8 +33,8 @@
 #define GREEN   "\x1b[32m"
 #define COLOR_RESET   "\x1b[0m"
 
-static const int messageLength = 15;
-static const int testPrecision = 25;
+#define messageLength 15
+#define testPrecision 25
 
 int main()
 {
@@ -43,14 +42,22 @@ int main()
     uint64_t message[messageLength];
     uint64_t messageCopy[messageLength];
     int i,j;
-    uint32_t keyInit[4];
+    uint16_t keyInit[8];
     uint64_t nonce;
     uint64_t *key=(uint64_t *)keyInit;
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	//key init
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
 
     
     for(i=0; i<testPrecision; i++)
@@ -67,10 +74,17 @@ int main()
     }
     printf(GREEN "Single Encription OK\n" COLOR_RESET);
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
     
     for(i=0; i<testPrecision; i++)
     {
@@ -87,10 +101,17 @@ int main()
     }
     printf(GREEN "CBC Encription OK\n" COLOR_RESET);
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
     
     for(i=0; i<testPrecision; i++)
     {
@@ -108,10 +129,17 @@ int main()
     }
     printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
     
     for(i=0; i<testPrecision; i++)
     {
@@ -130,10 +158,17 @@ int main()
     }
     printf(GREEN "CFB Encription OK\n" COLOR_RESET);
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
     
     for(i=0; i<testPrecision; i++)
     {
@@ -151,10 +186,17 @@ int main()
     }
     printf(GREEN "OFB Encription OK\n" COLOR_RESET);
     
-    keyInit[0] = rand();
-    keyInit[1] = rand();
-    keyInit[2] = rand();
-    keyInit[3] = rand();
+	do
+	{
+		keyInit[0] = rand();
+		keyInit[1] = rand();
+		keyInit[2] = rand();
+		keyInit[3] = rand();
+		keyInit[4] = rand();
+		keyInit[5] = rand();
+		keyInit[6] = rand();
+		keyInit[7] = rand();
+	} while (!KeyCheck(key));
     
     for(i=0; i<testPrecision; i++)
     {
@@ -174,7 +216,6 @@ int main()
     
     return 0;
 }
-
 
 
 

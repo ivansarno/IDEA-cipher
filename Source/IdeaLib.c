@@ -21,14 +21,14 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
 */
-//Version V.2.2
+//Version V.2.2.1
 
 #include "IdeaLib.h"
 #include "Round.h"
 #include "KeyCreation.h"
 
-static const int roundNumber = 7;
-static const int subKeyNumber = 56;
+#define roundNumber 7
+#define subKeyNumber 56
 
 static inline void IdeaRoutine(uint16_t *message, uint16_t *subKey)
 {

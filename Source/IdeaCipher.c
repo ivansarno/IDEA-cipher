@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.2
+//Version V.2.2.1
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -49,9 +49,11 @@ int SystemRandom(uint64_t *buffer)
 #ifdef _WIN32
     uint32_t *buff32 = (uint32_t *) buffer;
     for(int i=0; i<6; i++)
-        if(rand_s(buff32))
-            buff32++;
-        else return 1;
+    {
+		if (rand_s(buff32))
+			return 1;
+		buff32++;
+    }
     return 0;
 #else
 

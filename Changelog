@@ -1,3 +1,7 @@
+Version V.2.2.1
+
+Fix for Windows version
+
 Version V.2.2
 
 1) WIN32 platform specific memory wipe
