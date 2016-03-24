@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
 */
-//Version V.2.2.1
+//Version V.2.3
 
 #include "IdeaLib.h"
 #include "Round.h"
@@ -30,7 +30,7 @@
 #define roundNumber 7
 #define subKeyNumber 56
 
-static inline void IdeaRoutine(uint16_t *message, uint16_t *subKey)
+void IdeaRoutine(uint16_t *message, uint16_t *subKey)
 {
     for (int i = 0; i<roundNumber; i++)
     {

@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.2.1
+//Version V.2.3
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,29 +36,135 @@
 #define messageLength 15
 #define testPrecision 25
 
+static int CoreTest();
+static int ModeTest();
+static int StreamTest();
+static void MakeKey(uint16_t *Key);
+
 int main()
+{
+    if(CoreTest())
+        return 1;
+    if(ModeTest())
+        return 1;
+    if(StreamTest())
+        return 1;
+    
+    return 0;
+}
+
+static int ModeTest()
 {
     srand((unsigned int)time(NULL));
     uint64_t message[messageLength];
     uint64_t messageCopy[messageLength];
     int i,j;
-    uint16_t keyInit[8];
     uint64_t nonce;
-    uint64_t *key=(uint64_t *)keyInit;
+    uint64_t key[2];
     
-	//key init
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    MakeKey((uint16_t *) key);
+    for(i=0; i<testPrecision; i++)
+    {
+        for(j=0; j<messageLength; j++)
+            message[j]= messageCopy[j] = rand()*rand();
+        nonce = rand();
+        IdeaCBCEncrypt(message, key, nonce, messageLength);
+        IdeaCBCDecrypt(message, key, nonce, messageLength);
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED "CBC ERROR\n" COLOR_RESET);
+                return 1;
+            }
+    }
+    printf(GREEN "CBC Encription OK\n" COLOR_RESET);
+    
+    MakeKey((uint16_t *) key);
+    
+    for(i=0; i<testPrecision; i++)
+    {
+        for(j=0; j<messageLength; j++)
+            message[j]= messageCopy[j] = rand()*rand();
+        nonce = rand();
+        IdeaPCBCEncrypt(message, key, nonce, messageLength);
+        IdeaPCBCDecrypt(message, key, nonce, messageLength);
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED "PCBC ERROR\n" COLOR_RESET);
+                return 1;
+            }
+    }
+    printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
+    
+    MakeKey((uint16_t *) key);
+    
+    for(i=0; i<testPrecision; i++)
+    {
+        for(j=0; j<messageLength; j++)
+            message[j]= messageCopy[j] = rand()*rand();
+        nonce = rand()*rand();
+        uint64_t nonceb = nonce;
+        IdeaCFBEncrypt(message, key, nonce, messageLength);
+        IdeaCFBDecrypt(message, key, nonceb, messageLength);
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED "CFB ERROR\n" COLOR_RESET);
+                return 1;
+            }
+    }
+    printf(GREEN "CFB Encription OK\n" COLOR_RESET);
+    
+    MakeKey((uint16_t *) key);
+    
+    for(i=0; i<testPrecision; i++)
+    {
+        for(j=0; j<messageLength; j++)
+            message[j]= messageCopy[j] = rand()*rand();
+        nonce = rand()*rand();
+        IdeaOFB(message, key, nonce, messageLength);
+        IdeaOFB(message, key, nonce, messageLength);
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED  "OFB ERROR\n" COLOR_RESET);
+                return 1;
+            }
+    }
+    printf(GREEN "OFB Encription OK\n" COLOR_RESET);
+    
+    MakeKey((uint16_t *) key);
+    
+    for(i=0; i<testPrecision; i++)
+    {
+        for(j=0; j<messageLength; j++)
+            message[j]= messageCopy[j] = rand()*rand();
+        nonce =rand();
+        IdeaCTR(message, key, nonce, messageLength);
+        IdeaCTR(message, key, nonce, messageLength);
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED "CTR ERROR\n" COLOR_RESET);
+                return 1;
+            }
+    }
+    printf(GREEN "CTR Encription OK\n" COLOR_RESET);
+    
+    return 0;
+}
 
+static int CoreTest()
+{
+    srand((unsigned int)time(NULL));
+    uint64_t message[messageLength];
+    uint64_t messageCopy[messageLength];
+    int i;
+    uint64_t key[2];
+    
+    MakeKey((uint16_t *) key);
+    
     
     for(i=0; i<testPrecision; i++)
     {
@@ -74,147 +180,182 @@ int main()
     }
     printf(GREEN "Single Encription OK\n" COLOR_RESET);
     
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    return 0;
+}
+
+static int StreamTest()
+{
+    srand((unsigned int)time(NULL));
+    uint64_t message[messageLength];
+    uint64_t messageCopy[messageLength];
+    int i,j;
+    uint64_t nonce;
+    uint64_t key[2];
+    IdeaStreamStatus eStatus;
+    IdeaStreamStatus dStatus;
+    
+    MakeKey((uint16_t *) key);
+    
+    nonce = rand();
+    eStatus = IdeaStreamEncryptionInit(key, nonce);
+    dStatus = IdeaStreamDecryptionInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        nonce = rand();
-        IdeaCBCEncrypt(message, key, nonce, messageLength);
-        IdeaCBCDecrypt(message, key, nonce, messageLength);
-        if(message[0] != messageCopy[0])
-        {
-            printf(RED "CBC ERROR\n" COLOR_RESET);
-            return 1;
-        }
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamCBCEncrypt(message+j, eStatus);
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamCBCDecrypt(message+j, dStatus);
+        
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
+            {
+                printf(RED "StreamCBC ERROR\n" COLOR_RESET);
+                return 1;
+            }
     }
-    printf(GREEN "CBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCBC Encription OK\n" COLOR_RESET);
     
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    IdeaStreamStatusDelete(eStatus);
+    IdeaStreamStatusDelete(dStatus);
+    
+    MakeKey((uint16_t *) key);
+    
+    nonce = rand();
+    eStatus = IdeaStreamEncryptionInit(key, nonce);
+    dStatus = IdeaStreamDecryptionInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        nonce = rand();
-        IdeaPCBCEncrypt(message, key, nonce, messageLength);
-        IdeaPCBCDecrypt(message, key, nonce, messageLength);
+        
         for(j=0; j<messageLength; j++)
-            if(message[0] != messageCopy[0])
+            IdeaStreamPCBCEncrypt(message+j, eStatus);
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamPCBCDecrypt(message+j, dStatus);
+        
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
             {
                 printf(RED "PCBC ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamPCBC Encription OK\n" COLOR_RESET);
     
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    IdeaStreamStatusDelete(eStatus);
+    IdeaStreamStatusDelete(dStatus);
+    
+    MakeKey((uint16_t *) key);
+    
+    nonce = rand();
+    eStatus = IdeaStreamEncryptionInit(key, nonce);
+    dStatus = IdeaStreamEncryptionInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        nonce = rand()*rand();
-        uint64_t nonceb = nonce;
-        IdeaCFBEncrypt(message, key, nonce, messageLength);
-        IdeaCFBDecrypt(message, key, nonceb, messageLength);
+        
         for(j=0; j<messageLength; j++)
-            if(message[0] != messageCopy[0])
+            IdeaStreamCFBEncrypt(message+j, eStatus);
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamCFBDecrypt(message+j, dStatus);
+        
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
             {
                 printf(RED "CFB ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf(GREEN "CFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCFB Encription OK\n" COLOR_RESET);
     
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    IdeaStreamStatusDelete(eStatus);
+    IdeaStreamStatusDelete(dStatus);
+    
+    MakeKey((uint16_t *) key);
+    
+    nonce = rand();
+    eStatus = IdeaStreamEncryptionInit(key, nonce);
+    dStatus = IdeaStreamEncryptionInit(key, nonce);
+
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        nonce = rand()*rand();
-        IdeaOFB(message, key, nonce, messageLength);
-        IdeaOFB(message, key, nonce, messageLength);
+        
         for(j=0; j<messageLength; j++)
-            if(message[0] != messageCopy[0])
+            IdeaStreamOFB(message+j, eStatus);
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamOFB(message+j, dStatus);
+        
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
             {
                 printf(RED  "OFB ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf(GREEN "OFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamOFB Encription OK\n" COLOR_RESET);
     
-	do
-	{
-		keyInit[0] = rand();
-		keyInit[1] = rand();
-		keyInit[2] = rand();
-		keyInit[3] = rand();
-		keyInit[4] = rand();
-		keyInit[5] = rand();
-		keyInit[6] = rand();
-		keyInit[7] = rand();
-	} while (!KeyCheck(key));
+    IdeaStreamStatusDelete(eStatus);
+    IdeaStreamStatusDelete(dStatus);
+    
+    MakeKey((uint16_t *) key);
+    
+    nonce = rand();
+    eStatus = IdeaStreamEncryptionInit(key, nonce);
+    dStatus = IdeaStreamEncryptionInit(key, nonce);
+
     
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
             message[j]= messageCopy[j] = rand()*rand();
-        nonce =rand();
-        IdeaCTR(message, key, nonce, messageLength);
-        IdeaCTR(message, key, nonce, messageLength);
+        
         for(j=0; j<messageLength; j++)
-            if(message[0] != messageCopy[0])
+            IdeaStreamCFBEncrypt(message+j, eStatus);
+        
+        for(j=0; j<messageLength; j++)
+            IdeaStreamCFBDecrypt(message+j, dStatus);
+        
+        for(j=0; j<messageLength; j++)
+            if(message[j] != messageCopy[j])
             {
                 printf(RED "CTR ERROR\n" COLOR_RESET);
                 return 1;
             }
     }
-    printf(GREEN "CTR Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCTR Encription OK\n" COLOR_RESET);
     
+    IdeaStreamStatusDelete(eStatus);
+    IdeaStreamStatusDelete(dStatus);
     return 0;
+}
+
+static void MakeKey(uint16_t *key)
+{
+    do
+    {
+        key[0] = rand();
+        key[1] = rand();
+        key[2] = rand();
+        key[3] = rand();
+        key[4] = rand();
+        key[5] = rand();
+        key[6] = rand();
+        key[7] = rand();
+    } while (!KeyCheck((uint64_t *)key));
 }
 
 

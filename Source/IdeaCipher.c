@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.2.1
+//Version V.2.3
 
 #ifdef _WIN32
 #define _CRT_RAND_S

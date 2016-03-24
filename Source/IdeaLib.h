@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.2.1
+//Version V.2.3
 //complete set of fun that implement IDEA algorithm
 
 #ifndef __IdeaLib__IdeaLib__
@@ -88,5 +88,38 @@ uint64_t IdeaCounterGenInteger(IdeaGeneratorStatus status);
 
 //Fill a buffer of cryptography safe random 64 bit integer. Return 0 in case of error.
 int IdeaCounterGenFill(IdeaGeneratorStatus status, uint64_t *buffer, unsigned long long length);
+
+/*These functions provides the encryption modes on singles blocks from a stream*/
+
+//Internal status of the stream processor
+typedef void* IdeaStreamStatus;
+
+IdeaStreamStatus IdeaStreamEncryptionInit(uint64_t *key, uint64_t nonce);
+
+IdeaStreamStatus IdeaStreamDecryptionInit(uint64_t *key, uint64_t nonce);
+
+void IdeaStreamStatusDelete(IdeaStreamStatus status);
+
+void IdeaStreamCBCEncrypt(uint64_t *message, IdeaStreamStatus status);
+
+void IdeaStreamCBCDecrypt(uint64_t *message, IdeaStreamStatus status);
+
+void IdeaStreamPCBCEncrypt(uint64_t *message, IdeaStreamStatus status);
+
+void IdeaStreamPCBCDecrypt(uint64_t *message, IdeaStreamStatus status);
+
+void IdeaStreamCFBEncrypt(uint64_t *message, IdeaStreamStatus status);
+
+//Needs an IdeaStreamStatus initialized for encryption
+void IdeaStreamCFBDecrypt(uint64_t *message, IdeaStreamStatus status);
+
+//Needs an IdeaStreamStatus initialized for encryption
+void IdeaStreamOFB(uint64_t *message, IdeaStreamStatus status);
+
+//Needs an IdeaStreamStatus initialized for encryption
+void IdeaStreamCTR(uint64_t *message, IdeaStreamStatus status);
+
+//This is an internal routine
+void IdeaRoutine(uint16_t *message, uint16_t *subKey);
 
 #endif /* defined(__IdeaLib__IdeaLib__) */

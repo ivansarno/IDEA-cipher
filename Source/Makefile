@@ -1,15 +1,18 @@
 CFLAG = -std=c11 -O3
 DebugCFLAG = -std=c11 -g
+IdeaLibObjects = IdeaLib.o IdeaGenerators.o IdeaStream.o KeyCreation.o Round.o
+IdeaLibFiles = IdeaLib.c IdeaGenerators.c IdeaStream.c KeyCreation.c Round.c
+IdeaLibHeaders = IdeaLib.h KeyCreation.h Round.h
 
-IdeaCipher : IdeaCipher.o IdeaLib.o IdeaGenerators.o KeyCreation.o Round.o
+IdeaCipher : IdeaCipher.o $(IdeaLibObjects)
 
-IdeaLib :  IdeaLib.o IdeaGenerators.o KeyCreation.o Round.o
+IdeaLib :  $(IdeaLibObjects)
 	ar rcs IdeaLib.a $^
 
-Test : Test.o IdeaLib.o KeyCreation.o Round.o
+Test : Test.o $(IdeaLibObjects)
 
-DebugIdeaCipher : IdeaCipher.c IdeaLib.c IdeaGenerators.c KeyCreation.c Round.c
-	$(CC) $(DebugCFLAG) IdeaCipher.c IdeaLib.c IdeaGenerators.c KeyCreation.c Round.c -o DebugIdeaCipher
+DebugIdeaCipher : IdeaCipher.c $(IdeaLibFiles) $(IdeaLibHeaders)
+	$(CC) $(DebugCFLAG) IdeaCipher.c $(IdeaLibFiles) -o DebugIdeaCipher
 
-DebugTest : Test.c IdeaLib.c KeyCreation.c Round.c
-	$(CC) $(DebugCFLAG) Test.c IdeaLib.c KeyCreation.c Round.c -o DebugTest
+DebugTest : Test.c $(IdeaLibFiles) $(IdeaLibHeaders)
+	$(CC) $(DebugCFLAG) Test.c $(IdeaLibFiles) -o DebugTest
