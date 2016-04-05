@@ -151,6 +151,10 @@ uint64_t *MessageRead(char *messageFileName)
     stat(messageFileName, &st);
     uint64_t byteSize = (uint64_t) st.st_size; //size in bytes
     uint64_t intSize = (uint64_t)  (st.st_size) / 8 + 1; //size in 64 bit integers
+    
+    //warning large size
+    if(intSize > 0x7735940)
+        printf("Warning: file size is too large, memory error can occur");
 
     //first 2 values of message contain size in bytes and integer of the message
     uint64_t *message = (uint64_t *) malloc((intSize + 2) * sizeof(uint64_t));
