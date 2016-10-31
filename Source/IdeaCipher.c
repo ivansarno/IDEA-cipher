@@ -44,335 +44,25 @@ IdeaCipher -r numberOfBytes: store numberOfBytes cryptography safe random bytes 
 
 const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
-int SystemRandom(uint64_t *buffer)
-{
-#ifdef _WIN32
-    uint32_t *buff32 = (uint32_t *) buffer;
-    for(int i=0; i<6; i++)
-    {
-		if (rand_s(buff32))
-			return 1;
-		buff32++;
-    }
-    return 0;
-#else
 
-    int randomSource = open("/dev/random", O_RDONLY);
-    if(read(randomSource, buffer, 24) !=24)
-        return 1;
+const int bufferLength = 800; //must be multiple of 8
 
-    close(randomSource);
+int FileOpen(FILE **message, FILE **output, char *messageFileName);
+int MessageRead(FILE *message, uint64_t *buffer, int bufferLength);
+int MessageWrite(FILE *output, uint64_t *buffer, int bufferLength);
+uint64_t LengthRead(char *messageFileName);
+int LengthWrite(FILE *output, uint64_t messageLength);
+uint64_t OriginalLengthRead(FILE *message);
+int KeyRead(char *keyFileName, uint64_t *key);
+int KeyWrite(uint64_t *key);
+int KeyGen(uint64_t *key);
+int SystemRandom(uint64_t *buffer);
+int Encrypt(char *messageFileName, char *keyFileName);
+int Decrypt(char *messageFileName, char *keyFileName);
+int GenAndStore();
+int GenAndEncrypt(char *messageFileName);
+int RandomGeneration(int number);
 
-    return 0;
-#endif
-}
-
-int KeyWrite(uint64_t *key)
-{
-    FILE *keyFile = NULL;
-
-#ifndef SAFEIO
-    keyFile = fopen("key", "wb");
-
-#else
-    fopen_s(&keyFile,"key", "wb");
-#endif
-
-    if(keyFile == NULL)
-    {
-        printf("Error: can't create key file\n");
-        return 2;
-    }
-
-    if(fwrite(key, sizeof(uint64_t), 3, keyFile) != 3)
-    {
-        printf("Error: key writing fail\n");
-
-        fclose(keyFile);
-        return 3;
-    }
-
-    fclose(keyFile);
-    return 0;
-}
-
-int KeyRead(char *keyFileName, uint64_t *key)
-{
-    FILE *keyFile = NULL;
-
-#ifndef SAFEIO
-    keyFile = fopen(keyFileName, "rb");
-#else
-    fopen_s(&keyFile,keyFileName, "rb");
-#endif
-
-    if(!keyFile || (fread(key, sizeof(uint64_t), 3, keyFile) != 3))
-    {
-        printf("Error: Can't read key file.\n");
-        SecureMemoryWipe((void *)key, 24);
-        return 2;
-    }
-
-    fclose(keyFile);
-    return 0;
-}
-
-static inline int KeyGen(uint64_t *key)
-{
-    do
-    {
-        if(SystemRandom(key) != 0)
-        {
-            printf("Error: key generation fail\n");
-            return 2;
-        }
-    }while(!KeyCheck(key));
-
-    return 0;
-}
-
-//return information on size in bytes and in uint64_t in the first values of the array
-uint64_t *MessageRead(char *messageFileName)
-{
-    FILE *input = NULL;
-#ifndef SAFEIO
-    input = fopen(messageFileName, "rb");
-#else
-    fopen_s(&input,messageFileName, "rb");
-#endif
-
-    if(!input)
-    {
-        printf("Error: Can't open input.\n");
-        return NULL;
-    }
-
-    struct stat st;
-    stat(messageFileName, &st);
-    uint64_t byteSize = (uint64_t) st.st_size; //size in bytes
-    uint64_t intSize = (uint64_t)  (st.st_size) / 8 + 1; //size in 64 bit integers
-    
-    //warning large size
-    if(intSize > 0x7735940)
-        printf("Warning: file size is too large, memory error can occur");
-
-    //first 2 values of message contain size in bytes and integer of the message
-    uint64_t *message = (uint64_t *) malloc((intSize + 2) * sizeof(uint64_t));
-    if(!message)
-    {
-        printf("Error: memory allocation.\n");
-        fclose(input);
-        return NULL;
-    }
-    //set padding to 0
-    message[intSize] = message[intSize+1] = 0;
-
-    if(fread(message+2, sizeof(uint8_t), byteSize, input) != byteSize)
-    {
-        printf("Error: Can't read input file.\n");
-        free(message);
-        fclose(input);
-        return NULL;
-    }
-
-    message[0] = intSize;
-    message[1] = byteSize;
-
-    fclose(input);
-    return message;
-}
-
-int MessageWrite(uint64_t *message, uint64_t byteSize)
-{
-    FILE *output = NULL;
-#ifndef SAFEIO
-    output = fopen("output", "wb");
-#else
-    fopen_s(&output,"output", "wb");
-#endif
-
-    if(!output)
-    {
-        printf("Error: Can't create output file.\n");
-        return 2;
-    }
-
-    if(fwrite(message, sizeof(uint8_t), byteSize, output) != byteSize)
-    {
-        printf("error on output writing\n");
-        fclose(output);
-        return 3;
-    }
-
-    fclose(output);
-    return 0;
-}
-
-
-static inline int GenAndStore()
-{
-    uint64_t key[3];
-
-    if(KeyGen(key))
-        return 1;
-
-    if(KeyWrite(key))
-    {
-        SecureMemoryWipe(key, 24);
-        return 1;
-    }
-    return 0;
-}
-
-int GenAndEncrypt(char *messageFileName)
-{
-    uint64_t *message=MessageRead(messageFileName);
-
-    if(!message)
-        return 1;
-
-    uint64_t key[3];
-    if(KeyGen(key))
-    {
-        free(message);
-        return 1;
-    }
-
-    //first 2 values of message contain size in bytes and integer of the message
-    if(IdeaCBCEncrypt(message+2, key, key[2], message[0]) != message[0])
-    {
-        SecureMemoryWipe(key, 24);
-        printf(("Error: Encryption fail.\n"));
-        free(message);
-        return 2;
-    }
-
-    //write origial file size in bytes to remove padding in decryption
-    if(MessageWrite(message+1, (message[0]+1)*8))
-    {
-        SecureMemoryWipe(key, 24);
-        free(message);
-        return 3;
-    }
-
-    free(message);
-    if(KeyWrite(key))
-    {
-        SecureMemoryWipe(key, 24);
-        return 3;
-    }
-
-    SecureMemoryWipe(key, 24);
-    return 0;
-}
-
-int Encrypt(char *messageFileName, char *keyFileName)
-{
-    uint64_t *message=MessageRead(messageFileName);
-
-    if(!message)
-        return 1;
-
-    uint64_t key[3];
-    if(KeyRead(keyFileName, key))
-    {
-        free(message);
-        return 1;
-    }
-
-    //first 2 values of message contain size in bytes and integer of the message
-    if(IdeaCBCEncrypt(message+2, key, key[2], message[0]) != message[0])
-    {
-        SecureMemoryWipe(key, 24);
-        printf(("Error: Encryption fail.\n"));
-        free(message);
-        return 2;
-    }
-
-    //write origial file size in bytes to remove padding in decryption
-    if(MessageWrite(message+1, (message[0]+1)*8))
-    {
-        SecureMemoryWipe(key, 24);
-        free(message);
-        return 3;
-    }
-
-    free(message);
-    SecureMemoryWipe(key, 24);
-    return 0;
-}
-
-int Decrypt(char *messageFileName, char *keyFileName)
-{
-    uint64_t *message=MessageRead(messageFileName);
-
-    if(!message)
-        return 1;
-
-    uint64_t key[3];
-    if(KeyRead(keyFileName, key))
-    {
-        free(message);
-        return 1;
-    }
-
-    //first 2 values of message contain size in bytes and integer of the message
-    if(IdeaCBCDecrypt(message+3, key, key[2], message[0]-1) != message[0]-1)
-    {
-        SecureMemoryWipe(key, 24);
-        printf(("Error: Encryption fail.\n"));
-        free(message);
-        return 2;
-    }
-
-    //uising information stored in encryption phase to remove de padding
-    if(MessageWrite(message+3, message[2]))
-    {
-        SecureMemoryWipe(key, 24);
-        free(message);
-        return 3;
-    }
-
-    free(message);
-    SecureMemoryWipe(key, 24);
-    return 0;
-}
-
-
-int RandomGeneration(uint64_t number)
-{
-    if(number == 0)
-        return 0;
-
-    uint64_t key[3];
-    if(SystemRandom(key))
-    {
-        printf("Error: Random Number Generation Fail\n");
-        return 1;
-    }
-
-    uint8_t *buffer = (uint8_t *) malloc(number * sizeof(uint8_t));
-
-    if(!buffer)
-        return 1;
-
-    IdeaGeneratorStatus status = IdeaGeneratorInit(key, key[2], 500);
-
-    IdeaIterativeGenFill(status, buffer, number);
-
-    IdeaGeneratorDelete(status);
-
-    if(MessageWrite((uint64_t *)buffer, number))
-        return 2;
-
-    SecureMemoryWipe(buffer, number);
-
-    free(buffer);
-    return 0;
-}
-
-
-////////////
 int main(int argc, char **argv)
 {
     //command selection
@@ -386,23 +76,414 @@ int main(int argc, char **argv)
         printf("%s", manString);
         return 0;
     }
-
+    
     if(strcmp(argv[1], "-k") == 0)
         return GenAndStore();
-
+    
     if(strcmp(argv[1], "-e") == 0 && argc==3)
         return GenAndEncrypt(argv[2]);
-
+    
     if(strcmp(argv[1], "-e") == 0 && argc==4)
         return Encrypt(argv[2], argv[3]);
-
+    
     if(strcmp(argv[1], "-d") == 0 && argc==4)
         return Decrypt(argv[2], argv[3]);
-
+    
     if(strcmp(argv[1], "-r") == 0 && argc==3)
         return RandomGeneration(atoi(argv[2]));
-
+    
     printf("%s", errorInputString);
-
+    
     return 1;
+}
+
+
+
+int Encrypt(char *messageFileName, char *keyFileName)
+{
+    
+    FILE *message, *output;
+    uint64_t key[3];
+    uint64_t buffer[bufferLength / 8];
+    
+    if(KeyRead(keyFileName, key) < 0)
+        return 1;
+    
+    if(FileOpen(&message, &output, messageFileName) < 0)
+        return 1;
+    
+    uint64_t messageLength = LengthRead(messageFileName);
+    if(LengthWrite(output, messageLength) < 0)
+    {
+        fclose(message);
+        fclose(output);
+        return 1;
+    }
+    
+    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
+    
+    while (messageLength > 0)
+    {
+        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+            break;
+        int i;
+        for(i=0; i<(bufferLength/8); i++)
+            IdeaStreamCBCEncrypt(buffer+i, streamStatus);
+        
+        if(MessageWrite(output, buffer, bufferLength) <  0)
+            break;
+        
+        messageLength -= bufferLength;
+    }
+    
+    fclose(message);
+    fclose(output);
+    SecureMemoryWipe(key, 24);
+    if(messageLength > 0)
+    {
+        printf("Error: encryption not completed\n");
+        return 1;
+    }
+    return 0;
+}
+
+int Decrypt(char *messageFileName, char *keyFileName)
+{
+    
+    FILE *message, *output;
+    uint64_t key[3];
+    uint64_t buffer[bufferLength/8];
+    
+    if(KeyRead(keyFileName, key) < 0)
+        return 1;
+    
+    if(FileOpen(&message, &output, messageFileName) < 0)
+        return 1;
+    
+    uint64_t messageLength = OriginalLengthRead(message);
+    if(messageLength == 0)
+    {
+        fclose(message);
+        fclose(output);
+        return 1;
+    }
+    
+    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
+    
+    while (messageLength > bufferLength)
+    {
+        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+            break;
+        int i;
+        for(i=0; i<(bufferLength/8); i++)
+            IdeaStreamCBCDecrypt(buffer+i, streamStatus);
+        
+        if(MessageWrite(output, buffer, bufferLength) <  0)
+            break;
+        
+        messageLength -= bufferLength;
+    }
+    
+    //Process last byte without padding
+    if(MessageRead(message, buffer, bufferLength) <  0)
+    {
+        int i;
+        for(i=0; i<bufferLength; i++)
+            IdeaStreamCBCDecrypt(buffer+i, streamStatus);
+        
+        if(MessageWrite(output, buffer, (int) messageLength) >= 0)
+            messageLength = 0;
+    }
+    
+    fclose(message);
+    fclose(output);
+    SecureMemoryWipe(key, 24);
+    if(messageLength > 0)
+    {
+        printf("Error: decryption not completed\n");
+        return 1;
+    }
+    return 0;
+}
+
+int GenAndStore()
+{
+    uint64_t key[3];
+    
+    if(KeyGen(key))
+        return 1;
+    
+    if(KeyWrite(key))
+    {
+        SecureMemoryWipe(key, 24);
+        return 1;
+    }
+    return 0;
+}
+
+int GenAndEncrypt(char *messageFileName)
+{
+    FILE *message, *output;
+    uint64_t key[3];
+    uint64_t buffer[bufferLength / 8];
+    
+    if(KeyGen(key) != 0)
+        return 1;
+    
+    if(KeyWrite(key) != 0)
+        return 1;
+    
+    if(FileOpen(&message, &output, messageFileName) < 0)
+        return 1;
+    
+    uint64_t messageLength = LengthRead(messageFileName);
+    if(LengthWrite(output, messageLength) < 0)
+    {
+        fclose(message);
+        fclose(output);
+        return 1;
+    }
+    
+    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
+    
+    while (messageLength > 0)
+    {
+        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+            break;
+        int i;
+        for(i=0; i<(bufferLength/8); i++)
+            IdeaStreamCBCEncrypt(buffer+i, streamStatus);
+        
+        if(MessageWrite(output, buffer, bufferLength) <  0)
+            break;
+        
+        messageLength -= bufferLength;
+    }
+    
+    fclose(message);
+    fclose(output);
+    SecureMemoryWipe(key, 24);
+    if(messageLength > 0)
+    {
+        printf("Error: encryption not completed\n");
+        return 1;
+    }
+    return 0;
+}
+
+int RandomGeneration(int number)
+{
+    if(number == 0)
+        return 0;
+    
+    FILE *output = NULL;
+    
+#ifndef SAFEIO
+    output = fopen("output", "wb");
+    
+#else
+    fopen_s(&output,"output", "wb");
+#endif
+    
+    if(output == NULL)
+    {
+        printf("Error: can't create output file\n");
+        return 1;
+    }
+    uint64_t key[3];
+    if(SystemRandom(key))
+    {
+        printf("Error: Random Number Generation Fail\n");
+        return 1;
+    }
+    
+    uint8_t *buffer = (uint8_t *) malloc(number * sizeof(uint8_t));
+    
+    if(!buffer)
+        return 1;
+    
+    IdeaGeneratorStatus status = IdeaGeneratorInit(key, key[2], 500);
+    
+    IdeaIterativeGenFill(status, buffer, number);
+    
+    IdeaGeneratorDelete(status);
+    
+    if(MessageWrite(output, (uint64_t *)buffer, number))
+        return 2;
+    
+    SecureMemoryWipe(buffer, number);
+    
+    free(buffer);
+    return 0;
+}
+
+
+
+///////////////////////
+
+uint64_t LengthRead(char *messageFileName)
+{
+    struct stat st;
+    stat(messageFileName, &st);
+    return (uint64_t) st.st_size;
+}
+
+int LengthWrite(FILE *output, uint64_t messageLength)
+{
+    if(fwrite(&messageLength, sizeof(uint64_t), 1, output) != 1)
+    {
+        printf("error on output writing\n");
+        return -1;
+    }
+    return 0;
+    
+}
+
+uint64_t OriginalLengthRead(FILE *message)
+{
+    uint64_t length;
+    if(fread(&length, sizeof(uint64_t), 1, message) != 1)
+    {
+        printf("error on input reading\n");
+        return 0;
+    }
+    return length;
+}
+
+int MessageRead(FILE *message, uint64_t *buffer, int bufferLength)
+{
+    uint64_t byteReaded = fread(buffer, sizeof(uint8_t), bufferLength, message);
+    if(byteReaded < 1)
+    {
+        printf("error on input reading\n");
+        return -1;
+    }
+    else if(byteReaded == bufferLength)
+        return 1;
+    return 0;
+}
+
+
+int MessageWrite(FILE *output, uint64_t *buffer, int bufferLength)
+{
+    if(fwrite(buffer, sizeof(uint8_t), bufferLength, output) != bufferLength)
+    {
+        printf("error on output writing\n");
+        return -1;
+    }
+    return 0;
+}
+
+int KeyRead(char *keyFileName, uint64_t *key)
+{
+    FILE *keyFile = NULL;
+    
+#ifndef SAFEIO
+    keyFile = fopen(keyFileName, "rb");
+#else
+    fopen_s(&keyFile,keyFileName, "rb");
+#endif
+    
+    if(!keyFile || (fread(key, sizeof(uint64_t), 3, keyFile) != 3))
+    {
+        printf("Error: Can't read key file.\n");
+        SecureMemoryWipe((void *)key, 24);
+        return -1;
+    }
+    
+    fclose(keyFile);
+    return 0;
+}
+
+
+int FileOpen(FILE **message, FILE **output, char *messageFileName)
+{
+    *message = NULL;
+    *output = NULL;
+    
+#ifndef SAFEIO
+    *message = fopen(messageFileName, "rb");
+    *output = fopen("output", "wb");
+    
+#else
+    fopen_s(message,messageFileName, "rb");
+    fopen_s(output,"output", "wb");
+#endif
+    
+    if(*message == NULL || output == NULL)
+    {
+        printf("Error: Can't read input file or create optput file.\n");
+        fclose((*message));
+        fclose(*output);
+        return  -1;
+    }
+    
+    return 0;
+}
+
+int SystemRandom(uint64_t *buffer)
+{
+#ifdef _WIN32
+    uint32_t *buff32 = (uint32_t *) buffer;
+    for(int i=0; i<6; i++)
+    {
+        if (rand_s(buff32))
+            return 1;
+        buff32++;
+    }
+    return 0;
+#else
+    
+    int randomSource = open("/dev/random", O_RDONLY);
+    if(read(randomSource, buffer, 24) !=24)
+        return 1;
+    
+    close(randomSource);
+    
+    return 0;
+#endif
+}
+
+int KeyWrite(uint64_t *key)
+{
+    FILE *keyFile = NULL;
+    
+#ifndef SAFEIO
+    keyFile = fopen("key", "wb");
+    
+#else
+    fopen_s(&keyFile,"key", "wb");
+#endif
+    
+    if(keyFile == NULL)
+    {
+        printf("Error: can't create key file\n");
+        return -2;
+    }
+    
+    if(fwrite(key, sizeof(uint64_t), 3, keyFile) != 3)
+    {
+        printf("Error: key writing fail\n");
+        
+        fclose(keyFile);
+        return -3;
+    }
+    
+    fclose(keyFile);
+    return 0;
+}
+
+
+int KeyGen(uint64_t *key)
+{
+    do
+    {
+        if(SystemRandom(key) != 0)
+        {
+            printf("Error: key generation fail\n");
+            return -1;
+        }
+    }while(!KeyCheck(key));
+    
+    return 0;
 }
