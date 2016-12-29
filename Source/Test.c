@@ -41,7 +41,7 @@ static int ModeTest();
 static int StreamTest();
 static void MakeKey(uint16_t *Key);
 
-int main()
+/*int main()
 {
     if(CoreTest())
         return 1;
@@ -51,7 +51,7 @@ int main()
         return 1;
     
     return 0;
-}
+}*/
 
 static int ModeTest()
 {

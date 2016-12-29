@@ -50,9 +50,9 @@ const int bufferLength = 800; //must be multiple of 8
 int FileOpen(FILE **message, FILE **output, char *messageFileName);
 int MessageRead(FILE *message, uint64_t *buffer, int bufferLength);
 int MessageWrite(FILE *output, uint64_t *buffer, int bufferLength);
-uint64_t LengthRead(char *messageFileName);
-int LengthWrite(FILE *output, uint64_t messageLength);
-uint64_t OriginalLengthRead(FILE *message);
+int64_t LengthRead(char *messageFileName);
+int LengthWrite(FILE *output, int64_t messageLength);
+int64_t OriginalLengthRead(FILE *message);
 int KeyRead(char *keyFileName, uint64_t *key);
 int KeyWrite(uint64_t *key);
 int KeyGen(uint64_t *key);
@@ -112,7 +112,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
     if(FileOpen(&message, &output, messageFileName) < 0)
         return 1;
     
-    uint64_t messageLength = LengthRead(messageFileName);
+    int64_t messageLength = LengthRead(messageFileName);
     if(LengthWrite(output, messageLength) < 0)
     {
         fclose(message);
@@ -124,7 +124,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
     
     while (messageLength > 0)
     {
-        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
             break;
         int i;
         for(i=0; i<(bufferLength/8); i++)
@@ -160,7 +160,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
     if(FileOpen(&message, &output, messageFileName) < 0)
         return 1;
     
-    uint64_t messageLength = OriginalLengthRead(message);
+    int64_t messageLength = OriginalLengthRead(message);
     if(messageLength == 0)
     {
         fclose(message);
@@ -168,12 +168,13 @@ int Decrypt(char *messageFileName, char *keyFileName)
         return 1;
     }
     
-    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
+    IdeaStreamStatus streamStatus = IdeaStreamDecryptionInit(key, key[2]);
     
     while (messageLength > bufferLength)
     {
-        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
             break;
+
         int i;
         for(i=0; i<(bufferLength/8); i++)
             IdeaStreamCBCDecrypt(buffer+i, streamStatus);
@@ -185,12 +186,13 @@ int Decrypt(char *messageFileName, char *keyFileName)
     }
     
     //Process last byte without padding
-    if(MessageRead(message, buffer, bufferLength) <  0)
+    if(messageLength > 0 && MessageRead(message, buffer, bufferLength) >= 0)
     {
+
         int i;
-        for(i=0; i<bufferLength; i++)
+        for(i=0; i<bufferLength/8; i++)
             IdeaStreamCBCDecrypt(buffer+i, streamStatus);
-        
+
         if(MessageWrite(output, buffer, (int) messageLength) >= 0)
             messageLength = 0;
     }
@@ -198,7 +200,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
     fclose(message);
     fclose(output);
     SecureMemoryWipe(key, 24);
-    if(messageLength > 0)
+    if(messageLength != 0)
     {
         printf("Error: decryption not completed\n");
         return 1;
@@ -236,7 +238,7 @@ int GenAndEncrypt(char *messageFileName)
     if(FileOpen(&message, &output, messageFileName) < 0)
         return 1;
     
-    uint64_t messageLength = LengthRead(messageFileName);
+    int64_t messageLength = LengthRead(messageFileName);
     if(LengthWrite(output, messageLength) < 0)
     {
         fclose(message);
@@ -246,9 +248,10 @@ int GenAndEncrypt(char *messageFileName)
     
     IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
     
+    
     while (messageLength > 0)
     {
-        if(MessageRead(message, buffer, bufferLength) <  1)//< 0 = error, 0 = end of file
+        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
             break;
         int i;
         for(i=0; i<(bufferLength/8); i++)
@@ -311,6 +314,7 @@ int RandomGeneration(int number)
     if(MessageWrite(output, (uint64_t *)buffer, number))
         return 2;
     
+    SecureMemoryWipe(key, 3);
     SecureMemoryWipe(buffer, number);
     
     free(buffer);
@@ -319,18 +323,18 @@ int RandomGeneration(int number)
 
 
 
-///////////////////////
+///////////////////////support functions
 
-uint64_t LengthRead(char *messageFileName)
+int64_t LengthRead(char *messageFileName)
 {
     struct stat st;
     stat(messageFileName, &st);
-    return (uint64_t) st.st_size;
+    return st.st_size;
 }
 
-int LengthWrite(FILE *output, uint64_t messageLength)
+int LengthWrite(FILE *output, int64_t messageLength)
 {
-    if(fwrite(&messageLength, sizeof(uint64_t), 1, output) != 1)
+    if(fwrite(&messageLength, sizeof(int64_t), 1, output) != 1)
     {
         printf("error on output writing\n");
         return -1;
@@ -339,10 +343,10 @@ int LengthWrite(FILE *output, uint64_t messageLength)
     
 }
 
-uint64_t OriginalLengthRead(FILE *message)
+int64_t OriginalLengthRead(FILE *message)
 {
-    uint64_t length;
-    if(fread(&length, sizeof(uint64_t), 1, message) != 1)
+    int64_t length;
+    if(fread(&length, sizeof(int64_t), 1, message) != 1)
     {
         printf("error on input reading\n");
         return 0;
@@ -387,6 +391,13 @@ int KeyRead(char *keyFileName, uint64_t *key)
     if(!keyFile || (fread(key, sizeof(uint64_t), 3, keyFile) != 3))
     {
         printf("Error: Can't read key file.\n");
+        SecureMemoryWipe((void *)key, 24);
+        return -1;
+    }
+    
+    if(!KeyCheck(key))
+    {
+        printf("Error:Key not pass security test\n");
         SecureMemoryWipe((void *)key, 24);
         return -1;
     }
