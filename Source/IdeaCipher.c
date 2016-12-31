@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.3
+//Version V.2.4
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -44,12 +44,13 @@ IdeaCipher -r numberOfBytes: store numberOfBytes cryptography safe random bytes 
 
 const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
+//must be multiple of 8
+#define bufferLength  8000
 
-const int bufferLength = 800; //must be multiple of 8
 
 int FileOpen(FILE **message, FILE **output, char *messageFileName);
-int MessageRead(FILE *message, uint64_t *buffer, int bufferLength);
-int MessageWrite(FILE *output, uint64_t *buffer, int bufferLength);
+int MessageRead(FILE *message, uint64_t *buffer);
+int MessageWrite(FILE *output, uint64_t *buffer, int length);
 int64_t LengthRead(char *messageFileName);
 int LengthWrite(FILE *output, int64_t messageLength);
 int64_t OriginalLengthRead(FILE *message);
@@ -62,6 +63,7 @@ int Decrypt(char *messageFileName, char *keyFileName);
 int GenAndStore();
 int GenAndEncrypt(char *messageFileName);
 int RandomGeneration(int number);
+
 
 int main(int argc, char **argv)
 {
@@ -98,7 +100,6 @@ int main(int argc, char **argv)
 }
 
 
-
 int Encrypt(char *messageFileName, char *keyFileName)
 {
     
@@ -124,7 +125,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
     
     while (messageLength > 0)
     {
-        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
+        if(MessageRead(message, buffer) <  0)//< 0 error, 0 = end of file
             break;
         int i;
         for(i=0; i<(bufferLength/8); i++)
@@ -172,7 +173,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
     
     while (messageLength > bufferLength)
     {
-        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
+        if(MessageRead(message, buffer) <  0)//< 0 error, 0 = end of file
             break;
 
         int i;
@@ -186,7 +187,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
     }
     
     //Process last byte without padding
-    if(messageLength > 0 && MessageRead(message, buffer, bufferLength) >= 0)
+    if(messageLength > 0 && MessageRead(message, buffer) >= 0)
     {
 
         int i;
@@ -251,7 +252,7 @@ int GenAndEncrypt(char *messageFileName)
     
     while (messageLength > 0)
     {
-        if(MessageRead(message, buffer, bufferLength) <  0)//< 0 error, 0 = end of file
+        if(MessageRead(message, buffer) <  0)//< 0 error, 0 = end of file
             break;
         int i;
         for(i=0; i<(bufferLength/8); i++)
@@ -354,7 +355,7 @@ int64_t OriginalLengthRead(FILE *message)
     return length;
 }
 
-int MessageRead(FILE *message, uint64_t *buffer, int bufferLength)
+int MessageRead(FILE *message, uint64_t *buffer)
 {
     uint64_t byteReaded = fread(buffer, sizeof(uint8_t), bufferLength, message);
     if(byteReaded < 1)
@@ -368,9 +369,9 @@ int MessageRead(FILE *message, uint64_t *buffer, int bufferLength)
 }
 
 
-int MessageWrite(FILE *output, uint64_t *buffer, int bufferLength)
+int MessageWrite(FILE *output, uint64_t *buffer, int length)
 {
-    if(fwrite(buffer, sizeof(uint8_t), bufferLength, output) != bufferLength)
+    if(fwrite(buffer, sizeof(uint8_t), length, output) != length)
     {
         printf("error on output writing\n");
         return -1;

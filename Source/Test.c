@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.3
+//Version V.2.4
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ static int ModeTest();
 static int StreamTest();
 static void MakeKey(uint16_t *Key);
 
-/*int main()
+int main()
 {
     if(CoreTest())
         return 1;
@@ -51,7 +51,7 @@ static void MakeKey(uint16_t *Key);
         return 1;
     
     return 0;
-}*/
+}
 
 static int ModeTest()
 {
