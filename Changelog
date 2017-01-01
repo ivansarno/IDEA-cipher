@@ -1,3 +1,7 @@
+Version V.2.4
+
+IdeaCipher: implements stream encryption/decription to optimize memory usage.
+
 Version V.2.3
 
 IdeaStream: set of function that provides processing of individual blocks from a steam.

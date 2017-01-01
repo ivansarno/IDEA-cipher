@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.3
+//Version V.2.4
 /*
 implementation of key schedule of IDEA, subkey array is allocated in the caller function.
 See official algorithm reference for more details

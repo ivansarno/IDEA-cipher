@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.3
+//Version V.2.4
 //complete set of fun that implement IDEA algorithm
 
 #ifndef __IdeaLib__IdeaLib__
