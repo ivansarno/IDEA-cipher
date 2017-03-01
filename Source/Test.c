@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.4
+//Version V.3.0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -191,14 +191,15 @@ static int StreamTest()
     int i,j;
     uint64_t nonce;
     uint64_t key[2];
-    IdeaStreamStatus eStatus;
-    IdeaStreamStatus dStatus;
+    IdeaEncryptStreamStatus eStatus;
+    IdeaEncryptStreamStatus e2Status;
+    IdeaDecryptStreamStatus dStatus;
     
     MakeKey((uint16_t *) key);
     
     nonce = rand();
-    eStatus = IdeaStreamEncryptionInit(key, nonce);
-    dStatus = IdeaStreamDecryptionInit(key, nonce);
+    eStatus = IdeaStreamEncryptInit(key, nonce);
+    dStatus = IdeaStreamDecryptInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
@@ -220,14 +221,14 @@ static int StreamTest()
     }
     printf(GREEN "StreamCBC Encription OK\n" COLOR_RESET);
     
-    IdeaStreamStatusDelete(eStatus);
-    IdeaStreamStatusDelete(dStatus);
+    IdeaStreamEncryptDelete(eStatus);
+    IdeaStreamDecryptDelete(dStatus);
     
     MakeKey((uint16_t *) key);
     
     nonce = rand();
-    eStatus = IdeaStreamEncryptionInit(key, nonce);
-    dStatus = IdeaStreamDecryptionInit(key, nonce);
+    eStatus = IdeaStreamEncryptInit(key, nonce);
+    dStatus = IdeaStreamDecryptInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
@@ -249,14 +250,14 @@ static int StreamTest()
     }
     printf(GREEN "StreamPCBC Encription OK\n" COLOR_RESET);
     
-    IdeaStreamStatusDelete(eStatus);
-    IdeaStreamStatusDelete(dStatus);
+    IdeaStreamEncryptDelete(eStatus);
+    IdeaStreamDecryptDelete(dStatus);
     
     MakeKey((uint16_t *) key);
     
     nonce = rand();
-    eStatus = IdeaStreamEncryptionInit(key, nonce);
-    dStatus = IdeaStreamEncryptionInit(key, nonce);
+    eStatus = IdeaStreamEncryptInit(key, nonce);
+    e2Status = IdeaStreamEncryptInit(key, nonce);
     
     for(i=0; i<testPrecision; i++)
     {
@@ -267,7 +268,7 @@ static int StreamTest()
             IdeaStreamCFBEncrypt(message+j, eStatus);
         
         for(j=0; j<messageLength; j++)
-            IdeaStreamCFBDecrypt(message+j, dStatus);
+            IdeaStreamCFBDecrypt(message+j, e2Status);
         
         for(j=0; j<messageLength; j++)
             if(message[j] != messageCopy[j])
@@ -278,14 +279,14 @@ static int StreamTest()
     }
     printf(GREEN "StreamCFB Encription OK\n" COLOR_RESET);
     
-    IdeaStreamStatusDelete(eStatus);
-    IdeaStreamStatusDelete(dStatus);
+    IdeaStreamEncryptDelete(eStatus);
+    IdeaStreamEncryptDelete(e2Status);
     
     MakeKey((uint16_t *) key);
     
     nonce = rand();
-    eStatus = IdeaStreamEncryptionInit(key, nonce);
-    dStatus = IdeaStreamEncryptionInit(key, nonce);
+    eStatus = IdeaStreamEncryptInit(key, nonce);
+    e2Status = IdeaStreamEncryptInit(key, nonce);
 
     
     for(i=0; i<testPrecision; i++)
@@ -297,7 +298,7 @@ static int StreamTest()
             IdeaStreamOFB(message+j, eStatus);
         
         for(j=0; j<messageLength; j++)
-            IdeaStreamOFB(message+j, dStatus);
+            IdeaStreamOFB(message+j, e2Status);
         
         for(j=0; j<messageLength; j++)
             if(message[j] != messageCopy[j])
@@ -308,14 +309,14 @@ static int StreamTest()
     }
     printf(GREEN "StreamOFB Encription OK\n" COLOR_RESET);
     
-    IdeaStreamStatusDelete(eStatus);
-    IdeaStreamStatusDelete(dStatus);
+    IdeaStreamEncryptDelete(eStatus);
+    IdeaStreamEncryptDelete(e2Status);
     
     MakeKey((uint16_t *) key);
     
     nonce = rand();
-    eStatus = IdeaStreamEncryptionInit(key, nonce);
-    dStatus = IdeaStreamEncryptionInit(key, nonce);
+    eStatus = IdeaStreamEncryptInit(key, nonce);
+    e2Status = IdeaStreamEncryptInit(key, nonce);
 
     
     for(i=0; i<testPrecision; i++)
@@ -327,7 +328,7 @@ static int StreamTest()
             IdeaStreamCFBEncrypt(message+j, eStatus);
         
         for(j=0; j<messageLength; j++)
-            IdeaStreamCFBDecrypt(message+j, dStatus);
+            IdeaStreamCFBDecrypt(message+j, e2Status);
         
         for(j=0; j<messageLength; j++)
             if(message[j] != messageCopy[j])
@@ -338,8 +339,8 @@ static int StreamTest()
     }
     printf(GREEN "StreamCTR Encription OK\n" COLOR_RESET);
     
-    IdeaStreamStatusDelete(eStatus);
-    IdeaStreamStatusDelete(dStatus);
+    IdeaStreamEncryptDelete(eStatus);
+    IdeaStreamEncryptDelete(e2Status);
     return 0;
 }
 
@@ -357,9 +358,6 @@ static void MakeKey(uint16_t *key)
         key[7] = rand();
     } while (!KeyCheck((uint64_t *)key));
 }
-
-
-
 
 
 

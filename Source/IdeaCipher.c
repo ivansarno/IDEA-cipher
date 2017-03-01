@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.2.4
+//Version V.3.0
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "IdeaLib.h"
-#include "KeyCreation.h"
 #include <string.h>
 #include <sys/stat.h>
 
@@ -45,7 +44,7 @@ IdeaCipher -r numberOfBytes: store numberOfBytes cryptography safe random bytes 
 const char *errorInputString = "Input Error. Run \"IdeaCipher -h\" for help.\n";
 
 //must be multiple of 8
-#define bufferLength  8000
+#define bufferLength  16000
 
 
 int FileOpen(FILE **message, FILE **output, char *messageFileName);
@@ -107,9 +106,6 @@ int Encrypt(char *messageFileName, char *keyFileName)
     uint64_t key[3];
     uint64_t buffer[bufferLength / 8];
     
-    if(KeyRead(keyFileName, key) < 0)
-        return 1;
-    
     if(FileOpen(&message, &output, messageFileName) < 0)
         return 1;
     
@@ -120,8 +116,10 @@ int Encrypt(char *messageFileName, char *keyFileName)
         fclose(output);
         return 1;
     }
-    
-    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
+    if(KeyRead(keyFileName, key) < 0)
+        return 1;
+    IdeaEncryptStreamStatus streamStatus = IdeaStreamEncryptInit(key, key[2]);
+    SecureMemoryWipe(key, 24);
     
     while (messageLength > 0)
     {
@@ -139,7 +137,7 @@ int Encrypt(char *messageFileName, char *keyFileName)
     
     fclose(message);
     fclose(output);
-    SecureMemoryWipe(key, 24);
+    IdeaStreamEncryptDelete(streamStatus);
     if(messageLength > 0)
     {
         printf("Error: encryption not completed\n");
@@ -155,9 +153,6 @@ int Decrypt(char *messageFileName, char *keyFileName)
     uint64_t key[3];
     uint64_t buffer[bufferLength/8];
     
-    if(KeyRead(keyFileName, key) < 0)
-        return 1;
-    
     if(FileOpen(&message, &output, messageFileName) < 0)
         return 1;
     
@@ -168,8 +163,11 @@ int Decrypt(char *messageFileName, char *keyFileName)
         fclose(output);
         return 1;
     }
+    if(KeyRead(keyFileName, key) < 0)
+        return 1;
     
-    IdeaStreamStatus streamStatus = IdeaStreamDecryptionInit(key, key[2]);
+    IdeaDecryptStreamStatus streamStatus = IdeaStreamDecryptInit(key, key[2]);
+    SecureMemoryWipe(key, 24);
     
     while (messageLength > bufferLength)
     {
@@ -186,7 +184,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
         messageLength -= bufferLength;
     }
     
-    //Process last byte without padding
+    //Process last bytes without padding
     if(messageLength > 0 && MessageRead(message, buffer) >= 0)
     {
 
@@ -200,7 +198,7 @@ int Decrypt(char *messageFileName, char *keyFileName)
     
     fclose(message);
     fclose(output);
-    SecureMemoryWipe(key, 24);
+    IdeaStreamDecryptDelete(streamStatus);
     if(messageLength != 0)
     {
         printf("Error: decryption not completed\n");
@@ -217,10 +215,9 @@ int GenAndStore()
         return 1;
     
     if(KeyWrite(key))
-    {
-        SecureMemoryWipe(key, 24);
         return 1;
-    }
+    
+    SecureMemoryWipe(key, 24);
     return 0;
 }
 
@@ -247,8 +244,8 @@ int GenAndEncrypt(char *messageFileName)
         return 1;
     }
     
-    IdeaStreamStatus streamStatus = IdeaStreamEncryptionInit(key, key[2]);
-    
+    IdeaEncryptStreamStatus streamStatus = IdeaStreamEncryptInit(key, key[2]);
+    SecureMemoryWipe(key, 24);
     
     while (messageLength > 0)
     {
@@ -266,7 +263,7 @@ int GenAndEncrypt(char *messageFileName)
     
     fclose(message);
     fclose(output);
-    SecureMemoryWipe(key, 24);
+    IdeaStreamEncryptDelete(streamStatus);
     if(messageLength > 0)
     {
         printf("Error: encryption not completed\n");

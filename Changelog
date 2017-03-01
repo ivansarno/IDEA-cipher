@@ -1,3 +1,9 @@
+Version V.3.0
+
+AAA This viersion is not backward compatible.
+
+1) Redesign, better performance and security.
+
 Version V.2.4
 
 IdeaCipher: implements stream encryption/decription to optimize memory usage.

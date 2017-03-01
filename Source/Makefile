@@ -1,8 +1,8 @@
 CFLAG = -std=c11 -O3
 DebugCFLAG = -std=c11 -g
-IdeaLibObjects = IdeaLib.o IdeaGenerators.o IdeaStream.o KeyCreation.o Round.o
-IdeaLibFiles = IdeaLib.c IdeaGenerators.c IdeaStream.c KeyCreation.c Round.c
-IdeaLibHeaders = IdeaLib.h KeyCreation.h Round.h
+IdeaLibObjects = IdeaGenerators.o IdeaStream.o IdeaMode.o IdeaCore.o
+IdeaLibFiles = IdeaGenerators.c IdeaStream.c IdeaMode.c IdeaCore.c
+IdeaLibHeaders = IdeaLib.h
 
 IdeaCipher : IdeaCipher.o $(IdeaLibObjects)
 

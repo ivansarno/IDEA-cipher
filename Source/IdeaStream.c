@@ -21,11 +21,11 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.2.4
+//Version V.3.0
 
-#include "IdeaLib.h"
-#include "KeyCreation.h"
+#include "IdeaStream.h"
 #include <stdlib.h>
+#include "IdeaCore.h"
 
 
 typedef struct
@@ -34,100 +34,98 @@ typedef struct
     uint64_t nonce;
 }   StreamInternalStatus;
 
-IdeaStreamStatus IdeaStreamEncryptionInit(uint64_t *key, uint64_t nonce)
+IdeaEncryptStreamStatus IdeaStreamEncryptInit(uint64_t *key, uint64_t nonce)
 {
-    if(!key)
-        return NULL;
-    if(!KeyCheck(key))
-        return NULL;
-    
     StreamInternalStatus *status = (StreamInternalStatus *) malloc(sizeof(StreamInternalStatus));
-    EncryptKeyCreate(key, (uint64_t *)status->subKey);
+    EncryptKeyCreate(key, status->subKey);
     status->nonce = nonce;
-    return status;
+    IdeaEncryptStreamStatus s = {.privateData = status};
+    return s;
 }
 
-IdeaStreamStatus IdeaStreamDecryptionInit(uint64_t *key, uint64_t nonce)
+IdeaDecryptStreamStatus IdeaStreamDecryptInit(uint64_t *key, uint64_t nonce)
 {
-    if(!key)
-        return NULL;
-    if(!KeyCheck(key))
-        return NULL;
-    
     StreamInternalStatus *status = (StreamInternalStatus *) malloc(sizeof(StreamInternalStatus));
     DecryptKeyCreate(key, status->subKey);
     status->nonce = nonce;
-    return status;
+    IdeaDecryptStreamStatus s = {.privateData = status};
+    return s;
 }
 
-void IdeaStreamStatusDelete(IdeaStreamStatus status)
+void IdeaStreamEncryptDelete(IdeaEncryptStreamStatus status)
 {
-    SecureMemoryWipe(status, sizeof(StreamInternalStatus));
-    free(status);
+    SecureMemoryWipe(status.privateData, sizeof(StreamInternalStatus));
+    free(status.privateData);
 }
 
-void IdeaStreamCBCEncrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamDecryptDelete(IdeaDecryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    SecureMemoryWipe(status.privateData, sizeof(StreamInternalStatus));
+    free(status.privateData);
+}
+
+void IdeaStreamCBCEncrypt(uint64_t *message, IdeaEncryptStreamStatus status)
+{
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     *message ^= iStatus->nonce;
     IdeaRoutine((uint16_t *) message, iStatus->subKey);
     iStatus->nonce = *message;
 }
 
-void IdeaStreamCBCDecrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamCBCDecrypt(uint64_t *message, IdeaDecryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     uint64_t temp = *message;
     IdeaRoutine((uint16_t *) message, iStatus->subKey);
     *message ^= iStatus->nonce;
     iStatus->nonce = temp;
 }
 
-void IdeaStreamPCBCEncrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamPCBCEncrypt(uint64_t *message, IdeaEncryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     uint64_t temp = *message;
     *message ^= iStatus->nonce;
     IdeaRoutine((uint16_t *) message, iStatus->subKey);
     iStatus->nonce = *message ^ temp;
 }
 
-void IdeaStreamPCBCDecrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamPCBCDecrypt(uint64_t *message, IdeaDecryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     uint64_t temp = *message;
     IdeaRoutine((uint16_t *) message, iStatus->subKey);
     *message ^= iStatus->nonce;
     iStatus->nonce = temp ^ *message;
 }
 
-void IdeaStreamCFBEncrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamCFBEncrypt(uint64_t *message, IdeaEncryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     IdeaRoutine((uint16_t *) &(iStatus->nonce), iStatus->subKey);
     *message ^= iStatus->nonce;
     iStatus->nonce = *message;
 }
 
-void IdeaStreamCFBDecrypt(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamCFBDecrypt(uint64_t *message, IdeaEncryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     IdeaRoutine((uint16_t *) &(iStatus->nonce), iStatus->subKey);
     uint64_t temp = *message ^ iStatus->nonce;
     iStatus->nonce = *message;
     *message = temp;
 }
 
-void IdeaStreamOFB(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamOFB(uint64_t *message, IdeaEncryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     IdeaRoutine((uint16_t *) &(iStatus->nonce), iStatus->subKey);
     *message ^= iStatus->nonce;
 }
 
-void IdeaStreamCTR(uint64_t *message, IdeaStreamStatus status)
+void IdeaStreamCTR(uint64_t *message, IdeaEncryptStreamStatus status)
 {
-    StreamInternalStatus *iStatus = (StreamInternalStatus *) status;
+    StreamInternalStatus *iStatus = (StreamInternalStatus *) status.privateData;
     IdeaRoutine((uint16_t *) &(iStatus->nonce), iStatus->subKey);
     *message ^= iStatus->nonce;
     iStatus->nonce++;
