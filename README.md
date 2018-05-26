@@ -17,6 +17,7 @@ IdeaLib provides a implementation of IDEA algorithm for every need:
 	-Cipher Block Modes: CBC, PCBC, CFB, OFB, CTR
 	-Stream Operation (processing of individual blocks from a steam)
 	-Random Number Generators based on IDEA
+	-Parallel CTR mode using openmp
 
 
 **Other**
@@ -24,7 +25,7 @@ IdeaLib provides a implementation of IDEA algorithm for every need:
 The library is accompanied by:
 
 	-Test program: to verify the proper functioning of the library
-	-Makefile, with target: IdeaCipher, IdeaLib, Test, DebugIdeaCipher, DebugTest
+	-Makefile, with target: IdeaCipher, IdeaLib, Test, DebugIdeaCipher, IdeaLibParallel, TestParallel
 
 Compiler Warning
 

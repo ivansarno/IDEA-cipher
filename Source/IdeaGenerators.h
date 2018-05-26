@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 
 #ifndef IdeaGenerators_h
 #define IdeaGenerators_h
@@ -33,7 +33,7 @@
 //These generator are different, use a different instance of status for different generator;
 typedef struct {void* privateData;} IdeaGeneratorStatus;
 
-//initializes the satus of the generator
+//initializes the status of the generator
 //keyUpdatePeriod = number of iteration before key update
 IdeaGeneratorStatus IdeaGeneratorInit(uint64_t *key, uint64_t seed, uint64_t keyUpdatePeriod);
 

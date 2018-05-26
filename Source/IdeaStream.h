@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 
 #ifndef IdeaStream_h
 #define IdeaStream_h
@@ -37,6 +37,9 @@ typedef struct {void* privateData;} IdeaDecryptStreamStatus;
 IdeaEncryptStreamStatus IdeaStreamEncryptInit(uint64_t *key, uint64_t nonce);
 
 IdeaDecryptStreamStatus IdeaStreamDecryptInit(uint64_t *key, uint64_t nonce);
+
+//initializes a stream status for CTR mode to start from a block != 0
+IdeaEncryptStreamStatus IdeaStreamCTRRandomAccessInit(uint64_t *key, uint64_t nonce, uint64_t position);
 
 void IdeaStreamEncryptDelete(IdeaEncryptStreamStatus status);
 void IdeaStreamDecryptDelete(IdeaDecryptStreamStatus status);
@@ -56,5 +59,6 @@ void IdeaStreamCFBDecrypt(uint64_t *message, IdeaEncryptStreamStatus status);
 void IdeaStreamOFB(uint64_t *message, IdeaEncryptStreamStatus status);
 
 void IdeaStreamCTR(uint64_t *message, IdeaEncryptStreamStatus status);
+
 
 #endif /* IdeaStream_h */

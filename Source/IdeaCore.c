@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 //This file implements the core functionalities of IdeaLib
 
 #include "IdeaCore.h"
@@ -55,7 +55,7 @@ static inline void step1(uint16_t *message, uint16_t *key)
     message[3]=IdeaMultiplication(message[3],key[3]);
 }
 
-static inline void step2(uint16_t *message, uint16_t *temp)
+static inline void step2(const uint16_t *message, uint16_t *temp)
 {
     temp[0]= (message[0]^message[2]);
     temp[1]= (message[1]^message[3]);
@@ -73,13 +73,13 @@ static inline void step4(uint16_t *temp, uint16_t *key)
     temp[0]= temp[1] + temp[0];
 }
 
-static inline void step5(uint16_t *message,uint16_t *temp)
+static inline void step5(uint16_t *message, const uint16_t *temp)
 {
     message[0]=(message[0]^temp[1]);
     message[2]=(message[2]^temp[1]);
 }
 
-static inline void step6(uint16_t *message,uint16_t *temp)
+static inline void step6(uint16_t *message, const uint16_t *temp)
 {
     message[1]=(message[1]^temp[0]);
     message[3]=(message[3]^temp[0]);
@@ -175,12 +175,12 @@ static uint16_t MulInverse(uint16_t number)
     else return (uint16_t) (mulModulus + result);
 }
 
-//25 bit left shitf
+//25 bit left shift
 static inline void keyrotate(uint64_t *key)
 {
     uint64_t temp;
-    temp = (key[0] << 25) + (key[1] >> 39);
-    key[1] = (key[1] << 25) + (key[0] >> 39);
+    temp = (key[0] << 25u) + (key[1] >> 39u);
+    key[1] = (key[1] << 25u) + (key[0] >> 39u);
     key[0] = temp;
 }
 

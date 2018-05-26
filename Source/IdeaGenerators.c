@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 
 //This file implements secure random number generators based on IDEA
 

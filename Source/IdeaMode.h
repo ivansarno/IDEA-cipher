@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 ////This file contains the implementation of the block encryption modes for IDEA
 
 #ifndef __IdeaLib__IdeaLib__
@@ -53,5 +53,11 @@ size_t IdeaOFB(uint64_t *message, uint64_t *key, uint64_t nonce, size_t messageL
 
 //return number of block processed
 size_t IdeaCTR(uint64_t *message, uint64_t *key, uint64_t nonce, size_t messageLength);
+
+//return a pointer to blocks processed or NULL
+uint64_t* IdeaCTRRandomAccess(const uint64_t *ciphertext, uint64_t *key, uint64_t nonce, size_t position, size_t length);
+
+//return the block decrypted
+uint64_t IdeaCTRRandomAccessSingle(uint64_t *ciphertext, uint64_t *key, uint64_t nonce, size_t position);
 
 #endif /* defined(__IdeaLib__IdeaLib__) */

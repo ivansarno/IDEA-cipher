@@ -13,7 +13,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-//Version V.3.0
+//Version V.3.1
 
 #ifdef _WIN32
 #define _CRT_RAND_S
@@ -61,7 +61,7 @@ int Encrypt(char *messageFileName, char *keyFileName);
 int Decrypt(char *messageFileName, char *keyFileName);
 int GenAndStore();
 int GenAndEncrypt(char *messageFileName);
-int RandomGeneration(int number);
+int RandomGeneration(size_t number);
 
 
 int main(int argc, char **argv)
@@ -272,7 +272,7 @@ int GenAndEncrypt(char *messageFileName)
     return 0;
 }
 
-int RandomGeneration(int number)
+int RandomGeneration(size_t number)
 {
     if(number == 0)
         return 0;
@@ -366,7 +366,7 @@ int MessageRead(FILE *message, uint64_t *buffer)
 }
 
 
-int MessageWrite(FILE *output, uint64_t *buffer, int length)
+int MessageWrite(FILE *output, uint64_t *buffer, size_t length)
 {
     if(fwrite(buffer, sizeof(uint8_t), length, output) != length)
     {

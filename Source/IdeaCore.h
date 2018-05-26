@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 //This file contains the core functionalities of IdeaLib
 #ifndef IdeaCore_h
 #define IdeaCore_h

@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 
 #include "IdeaStream.h"
 #include <stdlib.h>
@@ -50,6 +50,11 @@ IdeaDecryptStreamStatus IdeaStreamDecryptInit(uint64_t *key, uint64_t nonce)
     status->nonce = nonce;
     IdeaDecryptStreamStatus s = {.privateData = status};
     return s;
+}
+
+IdeaEncryptStreamStatus IdeaStreamCTRRandomAccessInit(uint64_t *key, uint64_t nonce, uint64_t position)
+{
+    return IdeaStreamEncryptInit(key, nonce + position);
 }
 
 void IdeaStreamEncryptDelete(IdeaEncryptStreamStatus status)

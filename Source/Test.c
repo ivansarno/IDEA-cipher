@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  USA
  */
-//Version V.3.0
+//Version V.3.1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,21 +36,20 @@
 #define messageLength 15
 #define testPrecision 25
 
-static int CoreTest();
-static int ModeTest();
-static int StreamTest();
-static void MakeKey(uint16_t *Key);
 
-int main()
+static void MakeKey(uint16_t *key)
 {
-    if(CoreTest())
-        return 1;
-    if(ModeTest())
-        return 1;
-    if(StreamTest())
-        return 1;
-    
-    return 0;
+    do
+    {
+        key[0] = rand();
+        key[1] = rand();
+        key[2] = rand();
+        key[3] = rand();
+        key[4] = rand();
+        key[5] = rand();
+        key[6] = rand();
+        key[7] = rand();
+    } while (!KeyCheck((uint64_t *)key));
 }
 
 static int ModeTest()
@@ -77,7 +76,7 @@ static int ModeTest()
                 return 1;
             }
     }
-    printf(GREEN "CBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "CBC Encryption OK\n" COLOR_RESET);
     
     MakeKey((uint16_t *) key);
     
@@ -95,7 +94,7 @@ static int ModeTest()
                 return 1;
             }
     }
-    printf(GREEN "PCBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "PCBC Encryption OK\n" COLOR_RESET);
     
     MakeKey((uint16_t *) key);
     
@@ -114,7 +113,7 @@ static int ModeTest()
                 return 1;
             }
     }
-    printf(GREEN "CFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "CFB Encryption OK\n" COLOR_RESET);
     
     MakeKey((uint16_t *) key);
     
@@ -132,7 +131,7 @@ static int ModeTest()
                 return 1;
             }
     }
-    printf(GREEN "OFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "OFB Encryption OK\n" COLOR_RESET);
     
     MakeKey((uint16_t *) key);
     
@@ -150,7 +149,7 @@ static int ModeTest()
                 return 1;
             }
     }
-    printf(GREEN "CTR Encription OK\n" COLOR_RESET);
+    printf(GREEN "CTR Encryption OK\n" COLOR_RESET);
     
     return 0;
 }
@@ -178,7 +177,7 @@ static int CoreTest()
             return 1;
         }
     }
-    printf(GREEN "Single Encription OK\n" COLOR_RESET);
+    printf(GREEN "Single Encryption OK\n" COLOR_RESET);
     
     return 0;
 }
@@ -219,7 +218,7 @@ static int StreamTest()
                 return 1;
             }
     }
-    printf(GREEN "StreamCBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCBC Encryption OK\n" COLOR_RESET);
     
     IdeaStreamEncryptDelete(eStatus);
     IdeaStreamDecryptDelete(dStatus);
@@ -233,7 +232,7 @@ static int StreamTest()
     for(i=0; i<testPrecision; i++)
     {
         for(j=0; j<messageLength; j++)
-            message[j]= messageCopy[j] = rand()*rand();
+            message[j] = messageCopy[j] = rand()*rand();
         
         for(j=0; j<messageLength; j++)
             IdeaStreamPCBCEncrypt(message+j, eStatus);
@@ -248,7 +247,7 @@ static int StreamTest()
                 return 1;
             }
     }
-    printf(GREEN "StreamPCBC Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamPCBC Encryption OK\n" COLOR_RESET);
     
     IdeaStreamEncryptDelete(eStatus);
     IdeaStreamDecryptDelete(dStatus);
@@ -277,7 +276,7 @@ static int StreamTest()
                 return 1;
             }
     }
-    printf(GREEN "StreamCFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCFB Encryption OK\n" COLOR_RESET);
     
     IdeaStreamEncryptDelete(eStatus);
     IdeaStreamEncryptDelete(e2Status);
@@ -307,7 +306,7 @@ static int StreamTest()
                 return 1;
             }
     }
-    printf(GREEN "StreamOFB Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamOFB Encryption OK\n" COLOR_RESET);
     
     IdeaStreamEncryptDelete(eStatus);
     IdeaStreamEncryptDelete(e2Status);
@@ -337,26 +336,25 @@ static int StreamTest()
                 return 1;
             }
     }
-    printf(GREEN "StreamCTR Encription OK\n" COLOR_RESET);
+    printf(GREEN "StreamCTR Encryption OK\n" COLOR_RESET);
     
     IdeaStreamEncryptDelete(eStatus);
     IdeaStreamEncryptDelete(e2Status);
     return 0;
 }
 
-static void MakeKey(uint16_t *key)
+
+
+int main()
 {
-    do
-    {
-        key[0] = rand();
-        key[1] = rand();
-        key[2] = rand();
-        key[3] = rand();
-        key[4] = rand();
-        key[5] = rand();
-        key[6] = rand();
-        key[7] = rand();
-    } while (!KeyCheck((uint64_t *)key));
+    if(CoreTest())
+        return 1;
+    if(ModeTest())
+        return 1;
+    if(StreamTest())
+        return 1;
+    
+    return 0;
 }
 
 
