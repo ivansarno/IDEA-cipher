@@ -3,6 +3,8 @@ IDEA-cipher
 
 IDEA cryptography algorithm implementation
 
+**This project was designed for learning purposes, its use in real systems is not recommended. This project is not updated regularly.**
+
 **IdeaCipher**
 
 IdeaCipher is a stand alone command-line program that provides encryption/decryption of a file, key creation and random bytes generation.  
