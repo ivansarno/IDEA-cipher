@@ -3,7 +3,7 @@ IDEA-cipher
 
 IDEA cryptography algorithm implementation
 
-**This project was designed for learning purposes, its use in real systems is not recommended. This project will no longer be updated.**
+**This project was designed for learning purposes, its use in real systems is not recommended. The project will no longer be updated.**
 
 **IdeaCipher**
 
